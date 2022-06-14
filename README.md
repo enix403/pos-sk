@@ -1,6 +1,3 @@
-# elt-template
-Electron + Typescript template
+# POS App
+Written in Electron + Typescript (+ *(in future)* Rust)
 
-# Instructions
-
-Docs coming soon
