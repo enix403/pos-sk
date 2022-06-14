@@ -1,0 +1,16 @@
+**/node_modules/
+
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+
+*.sublime-project
+*.sublime-workspace
+build/
+
+# Just `ln -rs .git/info/exclude user.gitignore` and get your own private user-specific .gitignore
+user.gitignore

@@ -1,0 +1,28 @@
+{
+    "extends": "./../../tsconfig.json",
+
+    "compilerOptions": {
+        "target": "ESNext",
+        "lib": [
+            "DOM",
+            "DOM.Iterable",
+            "ESNext"
+        ],
+        "module": "ESNext",
+
+        "useDefineForClassFields": true,
+        "isolatedModules": true,
+        "jsx": "react-jsx",
+
+        "baseUrl": "./src",
+        "paths": {
+            "@/*": ["./*"],
+            "@shared/*": ["../../../shared/*"]
+        }
+    },
+    "include": [
+        "src",
+        "*.ts",
+        "../../shared/**/*"
+    ]
+}

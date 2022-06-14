@@ -1,0 +1,39 @@
+{
+    "extends": "./../../tsconfig.json",
+
+    "ts-node": {
+        "files": true,
+        "transpileOnly": true,
+        "compilerOptions": {
+            "module": "CommonJS",
+        },
+    },
+
+    "compilerOptions": {
+        // The output syntax version
+        "target": "ES2021",
+
+        // The runtime environment (nodejs 16 supports ES2021, which electron (v15) uses)
+        "lib": [ "ES2021" ],
+
+        // emit import/export syntax instead of require() which can then be tree-shaked by rollup
+        // and converted to commonjs require syntax (rollup doesn't seem to tree-shake any require calls, so
+        // we need to emit import/export syntax)
+        "module": "ES2020",
+
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+
+        "baseUrl": "./source",
+        "paths": {
+            "@/*": ["./*"],
+            "@shared/*": ["./../../../shared/*"],
+        },
+    },
+
+    "include": [
+        "*.ts",
+        "./**/*.ts",
+        "../../shared/**/*"
+    ],
+}

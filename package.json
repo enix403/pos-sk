@@ -1,0 +1,34 @@
+{
+    "name": "@application/root",
+    "private": true,
+    "version": "1.0.0",
+    "license": "UNLICENSED",
+    "workspaces": {
+        "packages": [
+            "units/*"
+        ],
+        "nohoist": [
+            "electron",
+            "**/typeorm/**",
+            "**/typeorm"
+        ]
+    },
+    "scripts": {
+        "postinstall": "patch-package",
+        "ptp": "patch-package",
+        "a:m": "yarn workspace @application/main add",
+        "a:r": "yarn workspace @application/renderer add",
+        "rd:m": "yarn workspace @application/main remove",
+        "rd:r": "yarn workspace @application/renderer remove",
+        "r:m": "yarn workspace @application/main run",
+        "r:r": "yarn workspace @application/renderer run",
+        "typecheck": "yarn r:m typecheck; yarn r:r typecheck",
+        "build": "yarn r:r build && yarn r:m build",
+        "package": "yarn r:m build-native-deps && yarn r:m pack"
+    },
+    "devDependencies": {
+        "patch-package": "^6.4.7",
+        "postinstall-postinstall": "^2.1.0",
+        "syncpack": "^5.8.15"
+    }
+}

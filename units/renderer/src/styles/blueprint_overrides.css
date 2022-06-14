@@ -1,0 +1,34 @@
+.bp3-heading {
+    font-weight: 500;
+}
+.bp3-html-select:not(.bp3-minimal) select {
+    background-image: none !important;
+}
+.bp3-control-indicator {
+    background-image: none !important;
+}
+
+.bp3-heading {
+    margin: 0;
+    padding: 0;
+}
+
+.bp3-radio-group .bp3-label:not(.txt-wrap),
+.bp3-form-group  .bp3-label:not(.txt-wrap) {
+    white-space: nowrap;
+}
+
+/*
+These are only for the dev dark mode
+
+textarea.bp3-input:not([class*="bp3-intent-"]),
+.bp3-input-group:not([class*="bp3-intent-"]) .bp3-input {
+    border: 1px solid #bbbbbb;
+}
+
+textarea.bp3-input:not([class*="bp3-intent-"]):not(:focus),
+.bp3-input-group:not([class*="bp3-intent-"]) .bp3-input:not(:focus) {
+    box-shadow: none;
+}
+
+*/

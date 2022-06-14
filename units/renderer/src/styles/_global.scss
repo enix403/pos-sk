@@ -1,0 +1,158 @@
+// Regular CSS imports do not work with relative path
+@import '@/styles/normalize_elements.css';
+@import '@/styles/blueprint_overrides.css';
+
+* {
+    font-family: 'Roboto', sans-serif;
+}
+body {
+    font-size: 0.875rem;
+    font-weight: 400;
+    line-height: 21px !important;
+    background-color: #ffffff;
+    padding: 0;
+    margin: 0;
+}
+
+html, body {
+    overflow: hidden;
+}
+
+#root {
+    min-width: 100vw;
+    min-height: 100vh;
+    width: 100vw;
+    height: 100vh;
+}
+
+.app-divider {
+    margin: 6px 0 9px;
+}
+
+.general-popover {
+    padding: 7px 5px;
+    background-color: #ffffff;
+}
+
+.center-text-flow {
+    display: inline-flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.center-everything {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.action-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+
+$flex-row-spacing: 5px;
+.flex-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: stretch;
+    margin: 0px $flex-row-spacing * -1;
+    flex-wrap: wrap;
+    > * {
+        margin: {
+            left: $flex-row-spacing;
+            right: $flex-row-spacing;
+        }
+        // flex: 1 0 auto;
+        flex: 1;
+    }
+}
+
+.flex-grow-full {
+    flex-grow: 1;
+}
+
+.radio-group {
+
+    margin-bottom: 15px;
+
+    > label:not(.bp3-radio) {
+        margin-bottom: 5px;
+        font-weight: 500;
+    }
+
+    .bp3-radio {
+        margin-bottom: 3px;
+        padding-left: 50px;
+
+        .bp3-control-indicator {
+            font-size: 18px;
+        }
+
+        &.bp3-inline {
+            padding-left: 30px;
+            &:nth-child(2) {
+                margin-left: 20px;
+            }
+        }
+    }
+
+    .bp3-control input:checked ~ .bp3-control-indicator {
+        // $bg-color: #FF7373;
+        // $bg-color: #14CCBD;
+        // $bg-color: #C274C2;
+        // $bg-color: #EB532D;
+        // $bg-color: #00B3A4;
+        $bg-color: #9179F2;
+
+        background-color: $bg-color;
+
+        outline: none;
+    }
+}
+
+.no-txt-wrap {
+    white-space: nowrap;
+}
+
+.rounded-tree { border-radius: 4px; overflow: hidden; }
+.icon-text-sm { margin: 0  3px; }
+.icon-text-md { margin: 0  6px; }
+.icon-text-lg { margin: 0 10px; }
+.header-margin-b-xl { margin-bottom: 25px; }
+.header-margin-b-l { margin-bottom: 15px; }
+.header-margin-b-m { margin-bottom: 9px; }
+.header-margin-b-s { margin-bottom: 6px; }
+
+.header-margin-t-xl { margin-top: 25px; }
+.header-margin-t-l { margin-top: 15px; }
+.header-margin-t-m { margin-top: 9px; }
+.header-margin-t-s { margin-top: 6px; }
+
+.header-margin-v-xl { margin-top: 25px; margin-bottom: 25px; }
+.header-margin-v-l { margin-top: 15px; margin-bottom: 15px; }
+.header-margin-v-m { margin-top: 9px; margin-bottom: 9px; }
+.header-margin-v-s { margin-top: 6px; margin-bottom: 6px; }
+
+.margin-b-xl { margin-bottom: 25px; }
+.margin-b-l { margin-bottom: 15px; }
+.margin-b-m { margin-bottom: 9px; }
+.margin-b-s { margin-bottom: 6px; }
+
+.margin-t-xl { margin-top: 25px; }
+.margin-t-l { margin-top: 15px; }
+.margin-t-m { margin-top: 9px; }
+.margin-t-s { margin-top: 6px; }
+
+.margin-v-xl { @extend .margin-b-xl; @extend .margin-t-xl; }
+.margin-v-l  { @extend .margin-b-l;  @extend .margin-t-l ; }
+.margin-v-m  { @extend .margin-b-m;  @extend .margin-t-m ; }
+.margin-v-s  { @extend .margin-b-s;  @extend .margin-t-s ; }
+
+// @import './tables';

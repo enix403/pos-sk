@@ -1,0 +1,132 @@
+$blue:    #007bff;
+$indigo:  #6610f2;
+$purple:  #6f42c1;
+$pink:    #e83e8c;
+$red:     #dc3545;
+$orange:  #fd7e14;
+$yellow:  #ffc107;
+$green:   #28a745;
+$teal:    #20c997;
+$cyan:    #17a2b8;
+
+$primary: $orange;
+
+/* ======================= */
+
+// $table-row-border-color: #c8c8c8;
+// $table-header-background: #f4f4f4;
+
+$table-header-border-color: #d9dcde;
+$table-row-border-color: #e9ecef;
+$table-text-color: #495057;
+$table-header-background: #f8f9fa;
+$table-row-background: #ffffff;
+
+.table-wrapper {
+    display: flex;
+    max-width: 100%;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.table-header {
+    margin: 0;
+    padding: 14px 20px;
+    border-color: $table-row-border-color;
+    border-style: solid;
+    border-width: 1px 1px 0px 1px;
+    background-color: $table-header-background;
+    color: $table-text-color;
+
+    // border-top-right-radius: 6px;
+    // border-top-left-radius: 6px;
+
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+
+    > .title {
+        font-weight: 500;
+        font-size: 21px;
+    }
+}
+
+.table-responsive { overflow-x: auto; }
+
+.table {
+    width: 100%;
+    margin: 0 0 0px 0;
+    border-collapse: collapse;
+    border-color: $table-row-border-color;
+    border-style: solid;
+    border-width: 1px;
+
+    tbody {
+        background-color: $table-row-background;
+    }
+
+    th, td {
+        cursor: default;
+        border-style: solid;
+        text-align: center;
+        color: $table-text-color;
+    }
+
+    th {
+        font-weight: 500;
+        padding: 14px 10px;
+
+        border-width: 2px 1px;
+        border-color: $table-header-border-color;
+
+        background-color: $table-header-background;
+        &:hover {
+            background-color: $table-row-border-color;
+        }
+    }
+
+    tr.small th {
+        padding-top:        5px;
+        padding-bottom:     5px;
+    }
+
+    td {
+        padding: 5px 10px;
+        border-width: 2px 0 2px 0;
+        border-color: $table-row-border-color;
+    }
+
+
+    tbody tr {
+        td {
+            position: relative;
+            transition: 0.2s all ease;
+            &:before, &:after {
+                transition: 0.2s all ease;
+                content: "";
+                left: 0;
+                right: 0;
+                position: absolute;
+                height: 1px;
+                background: $primary;
+                width: 100%;
+                opacity: 0;
+                visibility: hidden;
+            }
+            &:before { top: -1px; }
+            &:after  { bottom: -1px; }
+        }
+        &:hover, &.active {
+            td {
+                background: rgba($primary, 0.03);
+                &:before,
+                &:after {
+                    opacity: 1;
+                    visibility: visible;
+                }
+            }
+        }
+    }
+}

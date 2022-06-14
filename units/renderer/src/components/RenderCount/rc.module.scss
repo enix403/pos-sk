@@ -1,0 +1,17 @@
+$circle-size: 30px;
+
+.circle
+{
+  // position: absolute;
+  top: 0;
+  right: 0;
+  padding: 5px;
+  font-style: normal;
+  text-align: center;
+  height: $circle-size;
+  width: $circle-size;
+  line-height: $circle-size;
+  border-radius: $circle-size / 2;
+  border: 1px solid #ddd;
+  background: #eee;
+}

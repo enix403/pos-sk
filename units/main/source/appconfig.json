@@ -1,0 +1,9 @@
+{
+    "app_name": "MyAwesomeApp",
+    "app_name_long": "My Awesome App",
+
+    "default_win_title": "Hourglass POS",
+
+    "electron_data_directory_name": "hg-accountsapp-electron-cache",
+    "app_data_directory_name": "hg-accountsapp-data"
+}
