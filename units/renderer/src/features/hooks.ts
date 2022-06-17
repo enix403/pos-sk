@@ -1,18 +1,14 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import type { UnpackedCollection } from '@shared/tsutils';
 import {
-    AllMessages,
-    AppChannel,
-    ExtractMsgResult,
-    ExtractMsgPayload,
+    ChannelResponse,
     Message,
 } from '@shared/communication';
 import { formatResponseErrorLog, isResponseSuccessful } from '@/utils';
 
 // Use wisely. This hook only more like a helper for development when you'd want to re-fetch
 // some data from api insteads of reloading page
-export function useRefreshableEffect(callback: React.EffectCallback, deps: React.DependencyList)
-{
+export function useRefreshableEffect(callback: React.EffectCallback, deps: React.DependencyList) {
     const [updateCount, setUpdateCount] = useState(0);
     useEffect(callback, deps.concat([updateCount]));
 
@@ -38,29 +34,25 @@ export function useTrackedEffectFunc(
 };
 
 export function useMessageEffect<T, K>(
-    channelName: AppChannel,
     message: Message<T, K>,
     onLoad?: (data: K) => void,
     isResultArray?: boolean
 ) {
     const initialValue = !isResultArray ? undefined : [] as any;
 
-    const [data, setData] = React.useState<K | undefined>(initialValue);
+    // const [data, setData] = React.useState<K | undefined>(initialValue);
 
     const [effectObj, loading] = useTrackedEffectFunc(async () => {
-        setData(initialValue);
+        // setData(initialValue);
 
-        return window.SystemBackend.sendMessage(
-            channelName,
-            message
-        )
+        return window.SystemBackend.sendMessage(message)
             .then(res => {
                 if (isResponseSuccessful(res)) {
-                    setData(res.data!);
+                    // setData(res.data!);
                     onLoad?.(res.data!);
                 }
                 else {
-                    setData(initialValue);
+                    // setData(initialValue);
                     onLoad?.(initialValue);
                     console.error("Failed to send message:", formatResponseErrorLog(res));
                 }
@@ -69,12 +61,27 @@ export function useMessageEffect<T, K>(
 
     const refreshData = useRefreshableEffect(effectObj, []);
 
-    return [data, loading, refreshData] as const;
+    // return [data, loading, refreshData] as const;
+    return [loading, refreshData] as const;
 }
 
-/* =========================================== */
-/* ============== RAW MATERIALS ============== */
-/* =========================================== */
+export function useAppMessage<K>(
+    message: Message<any, K>,
+    onResponse: (response: ChannelResponse<K>) => void
+) {
 
-type RMMsgResult    = ExtractMsgResult<AllMessages.Inv.RM.GetAllMaterials>;
-type RMMsgPayload   = ExtractMsgPayload<AllMessages.Inv.RM.GetAllMaterials>;
+    const memCallback = React.useCallback(onResponse, []);
+
+    const [effectObj, loading] = useTrackedEffectFunc(async () => {
+        return window.SystemBackend.sendMessage(message)
+            .then(res => {
+                if (!isResponseSuccessful(res)) {
+                    console.error("useAppMessage(): Failed to send message:", formatResponseErrorLog(res));
+                }
+                memCallback(res);
+            })
+    });
+
+    const refresh = useRefreshableEffect(effectObj, []);
+    return [loading, refresh] as const;
+}

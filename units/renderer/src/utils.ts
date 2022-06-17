@@ -1,3 +1,5 @@
+import React from 'react';
+
 import type { ChannelResponse } from '@shared/communication/interfaces';
 import { CommResultType } from '@shared/communication/constants';
 import { AppToaster } from './toaster';
@@ -35,7 +37,7 @@ const LOG_ERROR_MESSAGES = {
 export const formatResponseErrorLog = (response: ChannelResponse<any>): string =>
     LOG_ERROR_MESSAGES[response.type]
 
-export const showGenericError = (message: string) => {
+export const simpleErrorAlert = (message: string) => {
     AppToaster.show({
         intent: 'danger',
         message: message,
@@ -50,4 +52,11 @@ export function blurAllInputs() {
     document.body.appendChild(tmp);
     tmp.focus();
     document.body.removeChild(tmp);
+}
+
+
+type MessageResponseCallback<K> = (response: ChannelResponse<K>) => void
+
+export function createMessageCallback<K>(callback: MessageResponseCallback<K>) {
+    return React.useCallback(callback, []);
 }

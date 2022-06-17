@@ -85,6 +85,7 @@ const SidebarBody = () => {
             >
                 <SidebarRouteEntry conf={appRoutes.home} />
                 <SidebarRouteEntry conf={appRoutes.stock.tradeItems} />
+                <SidebarRouteEntry conf={appRoutes.stock.inventory} />
             </SidebarNavSection>
 
 

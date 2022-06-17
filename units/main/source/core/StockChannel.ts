@@ -7,6 +7,8 @@ import { AllMessages } from "@shared/communication";
 import { TradeItem } from "@/entities";
 import { EFORK } from "@/database";
 
+import { sleep } from '@shared/commonutils'
+
 export class StockChannel extends IpcChannel {
 
     constructor()
@@ -33,8 +35,5 @@ export class StockChannel extends IpcChannel {
         return item;
     }
 
-    private listTradeItems: MessageHandler<AllMessages.Stock.GetTradeItems> = async () => EFORK().find(TradeItem, {});
+    private listTradeItems: MessageHandler<AllMessages.Stock.GetTradeItems> = async () => sleep(500).then(() => EFORK().find(TradeItem, {}));
 }
-
-// const delayPromiseBy = (pr: Promise<any>, ms: number) =>
-    // new Promise(res => setTimeout(res, ms)).then(() => pr);

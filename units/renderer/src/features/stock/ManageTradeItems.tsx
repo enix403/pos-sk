@@ -18,7 +18,7 @@ import {
   isResponseSuccessful,
   formatResponseErrorUser,
   formatResponseErrorLog,
-  showGenericError
+  simpleErrorAlert
 } from '@/utils'
 
 import {
@@ -28,6 +28,7 @@ import {
   minValue,
   mustBeNumber
 } from '@/components/fields'
+import { AppToaster } from '@/toaster';
 
 
 interface Values {
@@ -49,15 +50,23 @@ const TradeItemForm = ({ afterCreate }) => {
       onSubmit={async (values: Values, form) => {
         const result = await saveTradeItem(values);
 
-        if (!isResponseSuccessful(result))
-        {
-          showGenericError(formatResponseErrorUser(result));
+        if (!isResponseSuccessful(result)) {
+          simpleErrorAlert(formatResponseErrorUser(result));
           console.log(formatResponseErrorLog(result));
           return;
         }
 
+        AppToaster.show({
+          icon: "build",
+          message: (<>
+            Trade item <strong>{values.itemName}</strong> created successfully
+          </>),
+          intent: "success"
+        });
+
         blurAllInputs();
         form.restart();
+
         afterCreate();
       }}
       subscription={{ submitting: true, pristine: true }}
@@ -153,7 +162,7 @@ const TradeItemsList: React.FC<{ rows: IdentifiedTradeItem[] }> = ({ rows }) => 
   );
 };
 
-export const ManageTradeItems = () => {
+export const ManageTradeItemsView = () => {
   const [rows, setRows] = React.useState<IdentifiedTradeItem[]>([]);
   const [rowsLoading, setRowsLoading] = React.useState(false);
 
@@ -178,13 +187,13 @@ export const ManageTradeItems = () => {
 
   return (
     <NavPageView title="Manage Trade Items">
-      <Card elevation={2} style={{ margin: "15px 25px" }}>
+      <Card elevation={2} className="default-card">
         <h4 className="bp3-heading header-margin-b-l">
           Add Trade Item
         </h4>
         <TradeItemForm afterCreate={refreshList} />
       </Card>
-      <Card elevation={2} style={{ margin: "15px 25px 150px" }}>
+      <Card elevation={2} className="default-card">
         {rowsLoading ?
           <Spinner intent="primary" size={120} /> :
           <TradeItemsList rows={rows} />

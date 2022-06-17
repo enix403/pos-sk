@@ -23,13 +23,13 @@ type RuntimePathsInfo = {
 };
 
 const getFallbackPathInfo = (): RuntimePathsInfo =>
-    ({
-        userDataDir: __dirname,
-        appCacheDir: __dirname,
-        appDataDir: __dirname,
-        appConfigDir: __dirname,
-        assetsPath: __dirname,
-    });
+({
+    userDataDir: __dirname,
+    appCacheDir: __dirname,
+    appDataDir: __dirname,
+    appConfigDir: __dirname,
+    assetsPath: __dirname,
+});
 
 const runtimePaths = getFallbackPathInfo();
 

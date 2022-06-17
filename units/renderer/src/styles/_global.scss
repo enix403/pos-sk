@@ -155,4 +155,23 @@ $flex-row-spacing: 5px;
 .margin-v-m  { @extend .margin-b-m;  @extend .margin-t-m ; }
 .margin-v-s  { @extend .margin-b-s;  @extend .margin-t-s ; }
 
-// @import './tables';
+.margin-l-xl { margin-left: 25px; }
+.margin-l-l { margin-left: 15px; }
+.margin-l-m { margin-left: 9px; }
+.margin-l-s { margin-left: 6px; }
+
+.margin-r-xl { margin-right: 25px; }
+.margin-r-l { margin-right: 15px; }
+.margin-r-m { margin-right: 9px; }
+.margin-r-s { margin-right: 6px; }
+
+.margin-h-xl { @extend .margin-l-xl; @extend .margin-r-xl; }
+.margin-h-l  { @extend .margin-l-l;  @extend .margin-r-l ; }
+.margin-h-m  { @extend .margin-l-m;  @extend .margin-r-m ; }
+.margin-h-s  { @extend .margin-l-s;  @extend .margin-r-s ; }
+
+/* Commonly used definitions */
+
+.default-card {
+    margin: 15px 25px;
+}
