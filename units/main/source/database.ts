@@ -18,6 +18,9 @@ export function getMDBConfig(): Parameters<typeof MikroORM.init>[0] {
     const storagePath = path.join(getPath('data'), 'storage.sqlite3');
     return {
         driver: SqliteDriver,
+        // timezone: "+05:00",
+        forceUtcTimezone: true,
+        strict: true,
 
         dbName: storagePath,
         entities: allEntities,
@@ -28,7 +31,10 @@ export function getMDBConfig(): Parameters<typeof MikroORM.init>[0] {
 
         cache: { enabled: false },
         discovery: {
-            disableDynamicFileAccess: true
+            disableDynamicFileAccess: true,
+            requireEntitiesArray: true,
+            warnWhenNoEntities: false,
+
         }
     };
 }

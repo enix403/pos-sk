@@ -44,6 +44,13 @@ export const simpleErrorAlert = (message: string) => {
         icon: 'error'
     });
 };
+export const simpleSuccessAlert = (message: any) => {
+    AppToaster.show({
+        icon: "build",
+        message,
+        intent: "success"
+    });
+};
 
 
 // Hehe :)

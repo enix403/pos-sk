@@ -17,41 +17,84 @@ import { AllMessages } from '@shared/communication'
 import { IdentifiedTradeItem } from '@shared/contracts/ITradeItem'
 
 import { MessageTracker } from '@/features/MessageTracker';
-import { isResponseSuccessful, simpleErrorAlert } from '@/utils';
+import { formatResponseErrorLog, formatResponseErrorUser, isResponseSuccessful, simpleErrorAlert, simpleSuccessAlert } from '@/utils';
 
 
 type IManageInventoryViewState = {
   tradeItems: IdentifiedTradeItem[];
   itemsMessageState: MessageTracker.State;
+
+  selectedItemId?: string;
+  delta?: string;
+  desc: string;
 }
 
 export class ManageInventoryView extends React.Component<{}, IManageInventoryViewState>
 {
-  private messageTracker = new MessageTracker(new AllMessages.Stock.GetTradeItems());
-  private onItemsLoad: MessageTracker.HandlerAlias<typeof this.messageTracker> = (res, msgState) => {
-    this.setState({ itemsMessageState: msgState });
+  private itemTracker = new MessageTracker(new AllMessages.Stock.GetTradeItems());
+  private onItemsLoad: MessageTracker.HandlerAlias<typeof this.itemTracker> = (res, msgState) => {
+    this.setState({
+      itemsMessageState: msgState,
+      selectedItemId: undefined,
+      delta: undefined
+    });
 
     if (res == null)
       return;
 
     if (isResponseSuccessful(res)) {
-      this.setState({ tradeItems: res.data! });
+      const items = res.data!;
+      this.setState({
+        tradeItems: items,
+        selectedItemId: items.length > 0 ? items[0].id.toString() : undefined
+      });
     }
     else {
       simpleErrorAlert("Failed to load trade items. Try refreshing the items using the button below.");
-      this.setState({ tradeItems: [] });
+      this.setState({ tradeItems: [], selectedItemId: undefined });
     }
   }
 
-  private refreshTradeItems = () => this.messageTracker.sendMessage();
+  private refreshTradeItems = () => this.itemTracker.sendMessage();
 
   state: IManageInventoryViewState = {
     tradeItems: [],
-    itemsMessageState: this.messageTracker.getState()
+    itemsMessageState: this.itemTracker.getState(),
+    selectedItemId: undefined,
+    delta: undefined,
+    desc: "",
+  }
+
+  private onUpdate = async () => {
+    let { selectedItemId, delta, desc } = this.state;
+
+    let deltaN = +delta!;
+    let selectedItemIdN = +selectedItemId!;
+
+    if (!selectedItemId || !deltaN || !desc) {
+      simpleErrorAlert("Please fill all the fields");
+      return;
+    }
+
+    if (deltaN <= 0) {
+      simpleErrorAlert("Please fill all the fields");
+      return;
+    }
+
+    const result = await window.SystemBackend.sendMessage(new AllMessages.Stock.Update(selectedItemIdN, deltaN, desc));
+
+    if (!isResponseSuccessful(result)) {
+      simpleErrorAlert(formatResponseErrorUser(result));
+      console.log(formatResponseErrorLog(result));
+      return;
+    }
+
+    simpleSuccessAlert("Update performed successfully");
+    this.refreshTradeItems();
   }
 
   componentDidMount() {
-    this.messageTracker.watch(this.onItemsLoad);
+    this.itemTracker.watch(this.onItemsLoad);
   }
 
   render() {
@@ -71,6 +114,8 @@ export class ManageInventoryView extends React.Component<{}, IManageInventoryVie
                     <Button disabled={true} fill={true} alignText="left" text="Loading Items..." /> :
                     <HTMLSelect
                       fill={true}
+                      value={this.state.selectedItemId || undefined}
+                      onChange={e => this.setState({ selectedItemId: e.target.value })}
                     >
                       {this.state.tradeItems.map(item =>
                         <option key={item.id} value={item.id}>{item.name}</option>
@@ -84,11 +129,14 @@ export class ManageInventoryView extends React.Component<{}, IManageInventoryVie
                     placeholder="Enter item count"
                     fill={true}
                     leftIcon='delta'
+                    value={this.state.delta?.toString() ?? ""}
+                    onChange={e => this.setState({ delta: e.target.value })}
                   />
                 </FormGroup>
                 <Button
                   text="Update"
                   disabled={loadingItems}
+                  onClick={this.onUpdate}
                   intent="success"
                   className="margin-b-m margin-r-m"
                   icon="new-grid-item" />
@@ -108,12 +156,13 @@ export class ManageInventoryView extends React.Component<{}, IManageInventoryVie
                     fill={true}
                     placeholder={"Enter description"}
                     rows={8}
+                    value={this.state.desc?.toString()}
+                    onChange={e => this.setState({ desc: e.target.value })}
                   />
                 </FormGroup>
               </Col>
             </Row>
           </Container>
-
         </Card>
       </NavPageView>
     );

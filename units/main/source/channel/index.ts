@@ -15,17 +15,24 @@ import { logger } from '@/logging';
 type HMap = Record<string, MessageHandler<Message<any, any>>>;
 export type MessageHandler<M extends Message<any, any>> = (payload: ExtractMsgPayload<M>) => Promise<ExtractMsgResult<M>>
 
+export class MsgDispatch<T, K>
+{
+    constructor(
+        public readonly msgKlass: MessageFactory<T, K>,
+        public readonly handler: MessageHandler<Message<T, K>>
+    ) {}
+}
+
 export class IpcChannel {
     private handlers: HMap = {};
 
     public getHandlers = () => this.handlers;
 
     protected register<T, K>(
-        factory: MessageFactory<T, K>,
-        handler: (payload: T) => Promise<K>
+        dispatch: MsgDispatch<T, K>
     ): void {
-        const actionName = (factory as any as typeof Message).ACTION_NAME;
-        this.handlers[actionName] = handler.bind(this);
+        const actionName = (dispatch.msgKlass as any as typeof Message).ACTION_NAME;
+        this.handlers[actionName] = dispatch.handler.bind(this);
     }
 }
 

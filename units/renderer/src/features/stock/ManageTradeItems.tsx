@@ -18,7 +18,8 @@ import {
   isResponseSuccessful,
   formatResponseErrorUser,
   formatResponseErrorLog,
-  simpleErrorAlert
+  simpleErrorAlert,
+  simpleSuccessAlert,
 } from '@/utils'
 
 import {
@@ -56,13 +57,9 @@ const TradeItemForm = ({ afterCreate }) => {
           return;
         }
 
-        AppToaster.show({
-          icon: "build",
-          message: (<>
+        simpleSuccessAlert(<>
             Trade item <strong>{values.itemName}</strong> created successfully
-          </>),
-          intent: "success"
-        });
+        </>);
 
         blurAllInputs();
         form.restart();

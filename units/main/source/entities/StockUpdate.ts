@@ -6,6 +6,7 @@ export class StockUpdate extends SimpleEntity {
     inventory_item: IdentifiedReference<Inventory>;
     delta_units: number;
     description: string;
+    created_at: Date;
 }
 
 export const StockUpdateSchema = new EntitySchema<StockUpdate, SimpleEntity>({
@@ -19,6 +20,7 @@ export const StockUpdateSchema = new EntitySchema<StockUpdate, SimpleEntity>({
             nullable: false
         },
         delta_units: { type: Number },
-        description: { type: String }
+        description: { type: String },
+        created_at: { type: Date, onCreate: () => new Date() }
     }
 });
