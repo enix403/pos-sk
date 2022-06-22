@@ -5,7 +5,7 @@ import {
 import { SimpleEntity } from "./SimpleEntity";
 
 export class TradeItem extends SimpleEntity {
-    name: String;
+    name: string;
     salePrice: Number;
 }
 

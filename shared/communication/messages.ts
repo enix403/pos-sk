@@ -1,6 +1,8 @@
 import { Identified } from '../tsutils';
 import { ITradeItem } from '../contracts/ITradeItem';
 import { Message } from './interfaces';
+import { InventoryItemType } from '@shared/contracts/InventoryItemType';
+import { IInventoryRecord } from '@shared/contracts/IInventoryRecord';
 
 abstract class SimpleMessage<T, K> extends Message<T, K> {
     constructor(payload: T) {
@@ -28,17 +30,23 @@ export namespace AllMessages {
             inventory_item_handle: number;
             delta_units: number;
             description: string;
+            item_type: InventoryItemType;
         }
         export class Update extends Message<UpdatePayload, void> {
             static ACTION_NAME = "stk:inv:update";
             constructor(
                 handle: number,
                 delta: number,
-                desc: string
+                desc: string,
+                item_type: InventoryItemType = InventoryItemType.Trade /* Temporary default value */
             ) {
                 super();
-                this.payload = { inventory_item_handle: handle, delta_units: delta, description: desc };
+                this.payload = { inventory_item_handle: handle, delta_units: delta, description: desc, item_type };
             }
         }
+
+        export class GetInventory
+            extends SimpleMessage<void, Array<IInventoryRecord>>
+        { static ACTION_NAME = 'stk:inv:list'; }
     }
 };

@@ -66,7 +66,7 @@ export class ManageInventoryView extends React.Component<{}, IManageInventoryVie
   }
 
   private onUpdate = async () => {
-    let { selectedItemId, delta, desc } = this.state;
+    const { selectedItemId, delta, desc  } = this.state;
 
     let deltaN = +delta!;
     let selectedItemIdN = +selectedItemId!;

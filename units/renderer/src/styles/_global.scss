@@ -170,6 +170,40 @@ $flex-row-spacing: 5px;
 .margin-h-m  { @extend .margin-l-m;  @extend .margin-r-m ; }
 .margin-h-s  { @extend .margin-l-s;  @extend .margin-r-s ; }
 
+.padding-b-xl { padding-bottom: 25px; }
+.padding-b-l { padding-bottom: 15px; }
+.padding-b-m { padding-bottom: 9px; }
+.padding-b-s { padding-bottom: 6px; }
+
+.padding-t-xl { padding-top: 25px; }
+.padding-t-l { padding-top: 15px; }
+.padding-t-m { padding-top: 9px; }
+.padding-t-s { padding-top: 6px; }
+
+.padding-v-xl { @extend .padding-b-xl; @extend .padding-t-xl; }
+.padding-v-l  { @extend .padding-b-l;  @extend .padding-t-l ; }
+.padding-v-m  { @extend .padding-b-m;  @extend .padding-t-m ; }
+.padding-v-s  { @extend .padding-b-s;  @extend .padding-t-s ; }
+
+.padding-l-xl { padding-left: 25px; }
+.padding-l-l { padding-left: 15px; }
+.padding-l-m { padding-left: 9px; }
+.padding-l-s { padding-left: 6px; }
+
+.padding-r-xl { padding-right: 25px; }
+.padding-r-l { padding-right: 15px; }
+.padding-r-m { padding-right: 9px; }
+.padding-r-s { padding-right: 6px; }
+
+.padding-h-xl { @extend .padding-l-xl; @extend .padding-r-xl; }
+.padding-h-l  { @extend .padding-l-l;  @extend .padding-r-l ; }
+.padding-h-m  { @extend .padding-l-m;  @extend .padding-r-m ; }
+.padding-h-s  { @extend .padding-l-s;  @extend .padding-r-s ; }
+
+.d-block { display: block; }
+.d-inline { display: inline; }
+.d-inline-block { display: inline-block; }
+
 /* Commonly used definitions */
 
 .default-card {

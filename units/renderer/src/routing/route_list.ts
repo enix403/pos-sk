@@ -6,6 +6,9 @@ export const appRoutes = {
     stock: {
         tradeItems: { name: "Trade Items", path: "/stock/trade-items" },
         inventory: { name: "Inventory", path: "/stock/inventory" },
+    },
+    customer: {
+        cart: { name: "Customer Checkout", path: "/customer/checkout" },
     }
 }
 
