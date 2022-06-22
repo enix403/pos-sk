@@ -2,19 +2,32 @@ import type { Collection, IdentifiedReference } from '@mikro-orm/core';
 import type { EnhancedBool } from '@shared/tsutils';
 
 import { SimpleEntity, SimpleEntitySchema } from './SimpleEntity';
-import { TradeItem, TradeItemSchema } from './TradeItem'
-import { Inventory, InventorySchema } from './Inventory'
+
+import { StoreItem, StoreItemSchema, StoreItemAttribute, StoreItemAttributeSchema } from './StoreItem'
+import { Sale, SaleSchema, SaleItem, SaleItemSchema } from './Sale'
+
 import { StockUpdate, StockUpdateSchema } from './StockUpdate'
+import { ItemStock, ItemStockSchema } from './ItemStock'
 
 const allEntities = [
   SimpleEntitySchema,
 
-  TradeItemSchema,
-  InventorySchema,
+  StoreItemSchema,
+  StoreItemAttributeSchema,
+  SaleSchema,
+  SaleItemSchema,
   StockUpdateSchema,
+  ItemStockSchema,
 ];
 
-export { TradeItem, Inventory, StockUpdate };
+export {
+  StoreItem,
+  StoreItemAttribute,
+  Sale,
+  SaleItem,
+  StockUpdate,
+  ItemStock
+};
 
 export default allEntities;
 

@@ -1,102 +1,87 @@
+import { Reference } from '@mikro-orm/core';
+
 import { IpcChannel, MsgDispatch } from "@/channel";
 import { ChannelError } from "@/channel/exceptions";
 
-import { AllMessages } from "@shared/communication";
+import { MSG } from "@shared/communication";
 
-import { TradeItem, StockUpdate, Inventory } from "@/entities";
 import { EFORK } from "@/database";
+import {
+    entt_relation_list,
+    StoreItem,
+    StoreItemAttribute,
+    ItemStock,
+    StockUpdate
+} from '@/entities';
 
 import { sleep } from '@shared/commonutils'
-import { InventoryItemType } from "@shared/contracts/InventoryItemType";
-import { IInventoryRecord } from "@shared/contracts/IInventoryRecord";
-
 
 export class StockChannel extends IpcChannel {
-
     constructor() {
         super();
 
-        this.register(this.createTradeItem);
-        this.register(this.listTradeItems);
+        this.register(this.listStoreItems);
+        this.register(this.createStoreItem);
         this.register(this.updateStock);
-        this.register(this.listInventory);
     }
 
-    private createTradeItem = new MsgDispatch(AllMessages.Stock.CreateTradeItem, async (payload) => {
-        if (!payload.name)
-            throw new ChannelError("Invalid name");
+    private serializeItem = (item: StoreItem) => ({
+        ...item,
+        attributes: item.attributes.getItems()
+    });
 
-        if (payload.salePrice <= 0)
-            throw new ChannelError("Invalid sale price");
-
+    private listStoreItems = new MsgDispatch(MSG.Stock.GetStoreItems, async () => {
         const em = EFORK();
 
-        const item = em.create(TradeItem, payload);
+        const items = await em.find(StoreItem,
+            {}, { populate: entt_relation_list<StoreItem>('attributes') });
+
+        return items.map(this.serializeItem);
+    });
+
+    private createStoreItem = new MsgDispatch(MSG.Stock.CreatetStoreItem, async (payload) => {
+        const em = EFORK();
+
+        const { attributes, ...restPayload } = payload;
+
+        const item = em.create(StoreItem, restPayload);
+
+        for (const attrData of attributes) {
+            const attr = em.create(StoreItemAttribute, attrData);
+            item.attributes.add(attr);
+        }
+
         await em.persistAndFlush(item);
-
-        return item;
+        return this.serializeItem(item);
     });
 
-    private listTradeItems = new MsgDispatch(AllMessages.Stock.GetTradeItems, async () => {
-        // Gotta test the loading animations for now :}
-        return sleep(500).then(() => EFORK().find(TradeItem, {}));
-    })
-
-    private updateStock = new MsgDispatch(AllMessages.Stock.Update, async (payload) => {
-
+    private updateStock = new MsgDispatch(MSG.Stock.UpdateStock, async (payload) => {
         const em = EFORK();
 
-        // For now payload.inventory_item_handle always refers to a trade item
+        let storeItem: StoreItem;
+        try { storeItem = await em.findOneOrFail(StoreItem, { id: payload.store_item_id }); }
+        catch (e) { throw new ChannelError("Invalid store item reference."); }
 
-        let tradeItem: TradeItem;
-        try { tradeItem = await em.findOneOrFail(TradeItem, { id: payload.inventory_item_handle }); }
-        catch (e) { throw new ChannelError("Invalid inventory item reference."); }
+        let stockObject = await em.findOne(ItemStock, { item: storeItem });
 
-        let item = await em.findOne(Inventory, {
-            item_type: InventoryItemType.Trade,
-            item_handle: tradeItem.id
-        });
-
-        if (item == null) {
-            item = em.create(Inventory, {
-                item_type: InventoryItemType.Trade,
-                item_handle: tradeItem.id,
-                units: 0
+        if (stockObject == null) {
+            stockObject = em.create(ItemStock, {
+                item: storeItem,
+                unit_count: 0
             });
         }
 
-        item.units += payload.delta_units;
-        em.persist(item);
+        stockObject.unit_count += payload.body.delta_units;
+        await em.persistAndFlush(stockObject);
 
-        const updateObj = em.create(StockUpdate, {
-            inventory_item: item,
-            delta_units: payload.delta_units,
-            description: payload.description
+        const updateObject = em.create(StockUpdate, {
+            stock: Reference.create(stockObject),
+            delta_units: payload.body.delta_units,
+            description: payload.body.description
         });
 
-        em.persist(updateObj);
+        em.persist(updateObject);
 
-        em.flush();
-    });
-
-    private listInventory = new MsgDispatch(AllMessages.Stock.GetInventory, async () => {
-        const em = EFORK();
-        const rows = await em.find(Inventory, {});
-
-        const processed: IInventoryRecord[] = [];
-
-        for (const row of rows) {
-            const item = await em.findOneOrFail(TradeItem, { id: row.item_handle });
-            processed.push({
-                inv_id: row.id,
-                item_id: item.id,
-                item_name: item.name,
-                item_type: row.item_type,
-                unit: "none",
-                unit_count: row.units
-            });
-        }
-
-        return processed;
+        await em.flush();
     });
 }

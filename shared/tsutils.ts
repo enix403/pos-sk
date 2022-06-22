@@ -17,3 +17,5 @@ export type HasID<T = number> = { id: T };
 export type WithoutID<T extends HasID<any>> = Omit<T, 'id'>;
 
 export type Identified<Obj, IDType = number> = HasID<IDType> & Obj
+
+export interface IterableArrayLike<T> extends ArrayLike<T>, Iterable<T> {}
