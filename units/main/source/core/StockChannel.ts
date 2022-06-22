@@ -4,6 +4,8 @@ import { IpcChannel, MsgDispatch } from "@/channel";
 import { ChannelError } from "@/channel/exceptions";
 
 import { MSG } from "@shared/communication";
+import { SerializedDatetime } from "@shared/contracts/SerializedDatetime";
+import { IItemStock } from "@shared/contracts/IItemStock";
 
 import { EFORK } from "@/database";
 import {
@@ -23,11 +25,18 @@ export class StockChannel extends IpcChannel {
         this.register(this.listStoreItems);
         this.register(this.createStoreItem);
         this.register(this.updateStock);
+        this.register(this.listStocks);
     }
 
-    private serializeItem = (item: StoreItem) => ({
+    private serializeItem = (item: StoreItem, includeAttributes = false) => ({
         ...item,
-        attributes: item.attributes.getItems()
+        attributes: includeAttributes ? item.attributes.getItems() : []
+    });
+
+    private serializeStock = (itemStock: ItemStock): IItemStock => ({
+        ...itemStock,
+        item: this.serializeItem(itemStock.item.getEntity(), false),
+        updated_at:  SerializedDatetime.serialize(itemStock.updated_at),
     });
 
     private listStoreItems = new MsgDispatch(MSG.Stock.GetStoreItems, async () => {
@@ -36,7 +45,7 @@ export class StockChannel extends IpcChannel {
         const items = await em.find(StoreItem,
             {}, { populate: entt_relation_list<StoreItem>('attributes') });
 
-        return items.map(this.serializeItem);
+        return items.map(t => this.serializeItem(t, true));
     });
 
     private createStoreItem = new MsgDispatch(MSG.Stock.CreatetStoreItem, async (payload) => {
@@ -83,5 +92,11 @@ export class StockChannel extends IpcChannel {
         em.persist(updateObject);
 
         await em.flush();
+    });
+
+    private listStocks = new MsgDispatch(MSG.Stock.GetStocks, async () => {
+        const itemStocks = await EFORK().find(ItemStock,
+            {}, { populate: entt_relation_list<ItemStock>('item') });
+        return itemStocks.map(this.serializeStock);
     });
 }

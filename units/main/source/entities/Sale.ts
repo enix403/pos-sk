@@ -1,19 +1,22 @@
 import {
     EntitySchema,
-    IdentifiedReference
+    IdentifiedReference,
+    Collection
 } from "@mikro-orm/core"
 
-import { CreateEnttRef } from './utils'
+import { CreateEnttRef, CreateInverseManyEnttRef } from './utils'
 
 import { SimpleEntity } from './SimpleEntity'
 import { StoreItem } from './StoreItem'
 
 export class Sale extends SimpleEntity {
-    public customer_name: string;
+    public customer_name: string | null;
     public created_at: Date;
 
     public amount_total: number;
     public amount_paid: number;
+
+    public cart: Collection<SaleItem>;
 }
 
 export class SaleItem extends SimpleEntity {
@@ -31,7 +34,8 @@ export const SaleSchema = new EntitySchema<Sale, SimpleEntity>({
         customer_name: { type: String, nullable: true },
         created_at: { type: Date, nullable: false, onCreate: () => new Date() },
         amount_total: { type: Number, unsigned: false, nullable: false },
-        amount_paid: { type: Number, unsigned: false, nullable: false }
+        amount_paid: { type: Number, unsigned: false, nullable: false },
+        cart: CreateInverseManyEnttRef(() => SaleItem, saleItem => saleItem.sale)
     }
 });
 

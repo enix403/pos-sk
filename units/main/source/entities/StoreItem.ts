@@ -6,7 +6,7 @@ import {
 
 import { StoreItemFamily } from '@shared/contracts/IStoreItem'
 
-import { CreateEnttRef } from './utils'
+import { CreateEnttRef, CreateInverseManyEnttRef } from './utils'
 
 import { SimpleEntity } from './SimpleEntity'
 
@@ -46,11 +46,7 @@ export const StoreItemSchema = new EntitySchema<StoreItem, SimpleEntity>({
         price_per_unit: { type: Number, unsigned: false, nullable: false },
         active: { type: Boolean, nullable: false, default: false },
 
-        attributes: {
-            reference: '1:m',
-            entity: () => StoreItemAttribute,
-            mappedBy: attibute => attibute.item
-        }
+        attributes: CreateInverseManyEnttRef(() => StoreItemAttribute, attibute => attibute.item)
     }
 });
 
