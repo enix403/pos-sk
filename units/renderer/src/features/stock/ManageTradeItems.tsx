@@ -1,5 +1,5 @@
 import React from 'react';
-
+/*
 import { NavPageView } from '@/layout/views';
 import {
   Card,
@@ -199,3 +199,4 @@ export const ManageTradeItemsView = () => {
     </NavPageView>
   )
 }
+*/

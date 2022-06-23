@@ -1,7 +1,7 @@
 import {
     // AppChannel,
     CommResultType,
-    AllMessages,
+    MSG,
     Message
 } from "@shared/communication";
 
@@ -11,7 +11,7 @@ export function setupDevSystemApi() {
     if (process.env.NODE_ENV !== 'development')
         return
 
-    window['AllMessages'] = AllMessages;
+    window['MSG'] = MSG;
 
     if (window.SystemBackend && typeof window.SystemBackend == 'object')
         return

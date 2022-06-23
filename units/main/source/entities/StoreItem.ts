@@ -11,7 +11,7 @@ import { CreateEnttRef, CreateInverseManyEnttRef } from './utils'
 import { SimpleEntity } from './SimpleEntity'
 
 export class StoreItem extends SimpleEntity {
-    public pcode: string;
+    public pcode: string | null;
     public pcode_std: string;
     public name: string;
     public description: string;
@@ -35,7 +35,7 @@ export const StoreItemSchema = new EntitySchema<StoreItem, SimpleEntity>({
     class: StoreItem,
     tableName: 'tbl_store_items',
     properties: {
-        pcode: { type: String, nullable: false },
+        pcode: { type: String, nullable: true },
         pcode_std: { type: String, nullable: false },
         name: { type: String, nullable: false },
         description: { type: 'text', nullable: false },

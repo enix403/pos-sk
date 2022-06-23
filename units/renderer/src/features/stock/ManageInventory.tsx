@@ -1,5 +1,5 @@
 import React from 'react';
-
+/*
 import { NavPageView } from '@/layout/views';
 import {
   Card,
@@ -168,3 +168,4 @@ export class ManageInventoryView extends React.Component<{}, IManageInventoryVie
     );
   }
 }
+*/
