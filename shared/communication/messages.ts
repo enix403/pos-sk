@@ -27,7 +27,7 @@ export namespace MSG {
 
         /* =========================== */
 
-        export class CreatetStoreItem
+        export class CreateStoreItem
             extends SimpleMessage<IStoreItem, Identified<IStoreItem>>
         { static ACTION_NAME = 'stk:itm:create'; }
 

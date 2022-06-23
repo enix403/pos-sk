@@ -16,8 +16,19 @@ import {
   mustBeNumber
 } from '@/components/fields'
 import { sleep } from '@shared/commonutils';
+import {
+  blurAllInputs,
+  isResponseSuccessful,
+  formatResponseErrorUser,
+  formatResponseErrorLog,
+  simpleErrorAlert,
+  simpleSuccessAlert,
+} from '@/utils'
+import { Identified } from '@shared/tsutils';
+
 import { StoreItemFamily } from '@shared/contracts/IStoreItem';
-import { blurAllInputs } from '@/utils';
+import { MSG } from '@shared/communication';
+
 
 type FinalFormSubmit<T> = Config<T>['onSubmit'];
 
@@ -101,10 +112,12 @@ class AttributesList extends React.Component<{}, AttributesList.State> {
   }
 
   private addAttribute = () => {
-    this.updateAttr({ id: this.nextId++, name: "", value: "" });
+    const id = this.nextId++;
+    this.updateAttr({ id, name: "", value: "" });
+    this.setState({ currentlyEditingID: id });
   }
 
-  private toArray(): AttributesList.AttrObject[] {
+  public toArray(): AttributesList.AttrObject[] {
     return Object.values(this.state.attrs).filter(Boolean) as any;
   }
 
@@ -186,24 +199,25 @@ class AttributesList extends React.Component<{}, AttributesList.State> {
   }
 }
 namespace AttributesList {
-  export type AttrObjectID = number;
-  export interface AttrObject {
-    id: AttrObjectID;
+  export interface AttrObjectPlain {
     name: string;
     value: string;
   }
+  export type AttrObjectID = number;
+  export type AttrObject = Identified<AttrObjectPlain, AttrObjectID>;
   export interface State {
     attrs: Record<AttrObjectID, AttrObject | undefined>;
     currentlyEditingID: AttrObjectID | null;
   }
 }
 
-class StoreItemForm extends React.Component<{}, StoreItemForm.State> {
+class StoreItemForm extends React.Component<StoreItemForm.Props, StoreItemForm.State> {
 
   private START_SCAN_INFO = "Click to start scanning";
   private STOP_SCAN_INFO = "Click to cancel scanning";
 
   private codeInputRef: React.RefObject<any>;
+  private attributeListsRef: React.RefObject<AttributesList>;
 
   public state: StoreItemForm.State = {
     pcode_enabled: false,
@@ -216,6 +230,8 @@ class StoreItemForm extends React.Component<{}, StoreItemForm.State> {
 
     this.renderForm = this.renderForm.bind(this);
     this.codeInputRef = React.createRef();
+
+    this.attributeListsRef = React.createRef();
   }
 
   private handleCodeStatusChange = (e: any) => {
@@ -244,11 +260,27 @@ class StoreItemForm extends React.Component<{}, StoreItemForm.State> {
   }
 
   private onFormSubmit: StoreItemForm.OnSubmitType = async (values, form) => {
+    const list = this.attributeListsRef.current!;
+    const attributes = list.toArray();
+
+    let pcode_enabled = this.state.pcode_enabled;
+
+    let result: StoreItemForm.Action = {
+      ...(values as Required<typeof values>),
+      pcode_enabled: pcode_enabled,
+      pcode: pcode_enabled ? this.state.pcode : null,
+      attributes
+    };
+
+    try {
+      await this.props.onSave(result);
+    }
+    catch (e) {
+      return;
+    }
+
     blurAllInputs();
     form.restart();
-
-    await sleep(200);
-    window.alert(JSON.stringify(values, undefined, 2));
   };
 
   render() {
@@ -259,7 +291,8 @@ class StoreItemForm extends React.Component<{}, StoreItemForm.State> {
           subscription={{ submitting: true }}
           initialValues={{
             family: StoreItemFamily.TradeItem,
-            unit: 'piece'
+            unit: 'piece',
+            description: ""
           }}
         >
           {(rprops) => (
@@ -267,7 +300,7 @@ class StoreItemForm extends React.Component<{}, StoreItemForm.State> {
               {this.renderForm(rprops)}
 
               <Divider />
-              <AttributesList />
+              <AttributesList ref={this.attributeListsRef} />
 
               <Divider style={{ marginTop: "50px" }} />
 
@@ -425,6 +458,16 @@ namespace StoreItemForm {
     price_per_unit?: number;
   }
 
+  export interface Action extends Required<Values> {
+    pcode_enabled: boolean;
+    pcode: string | null;
+    attributes: AttributesList.AttrObjectPlain[];
+  }
+
+  export interface Props {
+    onSave: (payload: Action) => Promise<void> | void
+  }
+
   export interface State {
     pcode_enabled: boolean;
     pcode: string;
@@ -437,6 +480,31 @@ namespace StoreItemForm {
 
 
 export class ManageStoreItemsView extends React.Component {
+
+  private onItemSave = async (payload: StoreItemForm.Action) => {
+
+    const res = await window.SystemBackend.sendMessage(new MSG.Stock.CreateStoreItem({
+      pcode_std: payload.pcode_enabled ? "ucp" : "none",
+      pcode: payload.pcode,
+      name: payload.name,
+      description: payload.description,
+      family: payload.family,
+      unit: payload.unit,
+      price_per_unit: payload.price_per_unit,
+      attributes: payload.attributes,
+      active: true,
+    }));
+
+    if (!isResponseSuccessful(res)) {
+      simpleErrorAlert(formatResponseErrorUser(res));
+      console.log(formatResponseErrorLog(res));
+      throw new Error();
+    }
+
+    simpleSuccessAlert("Item added successfully");
+    // this.refresh();
+  }
+
   render() {
     return (
       <NavPageView title="Store Items">
@@ -445,7 +513,7 @@ export class ManageStoreItemsView extends React.Component {
             Add Store Item
           </h4>
 
-          <StoreItemForm />
+          <StoreItemForm onSave={this.onItemSave} />
         </Card>
       </NavPageView>
     );

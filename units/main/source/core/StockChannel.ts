@@ -48,7 +48,7 @@ export class StockChannel extends IpcChannel {
         return items.map(t => this.serializeItem(t, true));
     });
 
-    private createStoreItem = new MsgDispatch(MSG.Stock.CreatetStoreItem, async (payload) => {
+    private createStoreItem = new MsgDispatch(MSG.Stock.CreateStoreItem, async (payload) => {
         const em = EFORK();
 
         const { attributes, ...restPayload } = payload;

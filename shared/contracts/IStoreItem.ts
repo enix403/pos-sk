@@ -11,7 +11,7 @@ export interface IStoreItemAttribute {
 }
 
 export interface IStoreItem {
-    pcode: string;
+    pcode: string | null;
     pcode_std: string;
 
     family: StoreItemFamily;
