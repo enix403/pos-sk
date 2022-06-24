@@ -1,5 +1,20 @@
 import { IterableArrayLike } from '../tsutils';
 
+export interface UnitDescription {
+    slug: string;
+    title: string;
+}
+
+export const availableUnits: UnitDescription[] = [
+    { slug: "piece", title: "Piece" },
+    { slug: "mt", title: "Meters (m)" },
+    { slug: "in", title: "Inches (in)" },
+    { slug: "kg", title: "Kilograms (kg)" },
+    { slug: "gm", title: "Grams (g)" },
+    { slug: "lt", title: "Litres (lt)" },
+    { slug: "oz", title: "Ounces (oz)" }
+]
+
 export enum StoreItemFamily {
     TradeItem = 'trade_item',
     SelfBrand = 'self_brand'

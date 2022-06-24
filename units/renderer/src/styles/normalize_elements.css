@@ -33,5 +33,5 @@ hr {
 }
 
 table th, table td {
-    white-space: nowrap !important;
+    white-space: nowrap;
 }

@@ -56,7 +56,7 @@ export class StockChannel extends IpcChannel {
         const item = em.create(StoreItem, restPayload);
 
         for (const attrData of attributes) {
-            const attr = em.create(StoreItemAttribute, attrData);
+            const attr = em.create(StoreItemAttribute, { name: attrData.name, value: attrData.value });
             item.attributes.add(attr);
         }
 

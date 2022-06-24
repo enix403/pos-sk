@@ -72,6 +72,13 @@ $table-row-background: #ffffff;
         border-style: solid;
         text-align: center;
         color: $table-text-color;
+
+        &.al {
+            text-align: left;
+        }
+        &.ar {
+            text-align: right;
+        }
     }
 
     th {
