@@ -50,5 +50,4 @@ export const initApp = async () => {
     app.on("activate", () => {
         recreateWindow();
     });
-
 }

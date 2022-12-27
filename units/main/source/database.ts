@@ -16,7 +16,9 @@ export const EFORK = () => orm.em.fork();
 
 export function getMDBConfig(): Parameters<typeof MikroORM.init>[0] {
     const storagePath = path.join(getPath('data'), 'storage.sqlite3');
+
     return {
+        // @ts-ignore
         driver: SqliteDriver,
         // timezone: "+05:00",
         forceUtcTimezone: true,
@@ -34,13 +36,13 @@ export function getMDBConfig(): Parameters<typeof MikroORM.init>[0] {
             disableDynamicFileAccess: true,
             requireEntitiesArray: true,
             warnWhenNoEntities: false,
-
         }
     };
 }
 
 export async function createDBConnection() {
     orm = await MikroORM.init(getMDBConfig());
+
     if (!IS_RUNNING_DEV) {
         await orm.getSchemaGenerator().updateSchema();
     }

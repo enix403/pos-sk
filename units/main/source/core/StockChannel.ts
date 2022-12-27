@@ -36,7 +36,7 @@ export class StockChannel extends IpcChannel {
     private serializeStock = (itemStock: ItemStock): IItemStock => ({
         ...itemStock,
         item: this.serializeItem(itemStock.item.getEntity(), false),
-        updated_at:  SerializedDatetime.serialize(itemStock.updated_at),
+        updated_at: SerializedDatetime.serialize(itemStock.updated_at),
     });
 
     private listStoreItems = new MsgDispatch(MSG.Stock.GetStoreItems, async () => {
@@ -60,7 +60,13 @@ export class StockChannel extends IpcChannel {
             item.attributes.add(attr);
         }
 
-        await em.persistAndFlush(item);
+        // await em.persistAndFlush(item);
+        const stockObject = em.create(ItemStock, {
+            item: item,
+            unit_count: 0
+        });
+
+        await em.persistAndFlush(stockObject);
         return this.serializeItem(item);
     });
 

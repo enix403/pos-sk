@@ -1,27 +1,32 @@
 import React from 'react';
-/*
 import { NavPageView } from '@/layout/views';
 import {
   Card,
   FormGroup,
   InputGroup,
   Button,
-  Spinner,
-  Intent,
   HTMLSelect,
   TextArea
 } from '@blueprintjs/core';
 import { Container, Row, Col } from 'react-grid-system';
 
-import { AllMessages } from '@shared/communication'
-import { IdentifiedTradeItem } from '@shared/contracts/ITradeItem'
+import { MSG } from '@shared/communication'
+import { IStoreItem } from '@shared/contracts/IStoreItem'
+import { Identified } from '@shared/tsutils'
 
 import { MessageTracker } from '@/features/MessageTracker';
-import { formatResponseErrorLog, formatResponseErrorUser, isResponseSuccessful, simpleErrorAlert, simpleSuccessAlert } from '@/utils';
+import {
+  formatResponseErrorLog,
+  formatResponseErrorUser,
+  isResponseSuccessful,
+  simpleErrorAlert,
+  simpleSuccessAlert
+} from '@/utils';
 
+type IdentifiedStoreItem = Identified<IStoreItem>
 
-type IManageInventoryViewState = {
-  tradeItems: IdentifiedTradeItem[];
+type IManageStockViewState = {
+  tradeItems: IdentifiedStoreItem[];
   itemsMessageState: MessageTracker.State;
 
   selectedItemId?: string;
@@ -29,9 +34,9 @@ type IManageInventoryViewState = {
   desc: string;
 }
 
-export class ManageInventoryView extends React.Component<{}, IManageInventoryViewState>
+export class ManageStockView extends React.Component<{}, IManageStockViewState>
 {
-  private itemTracker = new MessageTracker(new AllMessages.Stock.GetTradeItems());
+  private itemTracker = new MessageTracker(new MSG.Stock.GetStoreItems());
   private onItemsLoad: MessageTracker.HandlerAlias<typeof this.itemTracker> = (res, msgState) => {
     this.setState({
       itemsMessageState: msgState,
@@ -57,7 +62,7 @@ export class ManageInventoryView extends React.Component<{}, IManageInventoryVie
 
   private refreshTradeItems = () => this.itemTracker.sendMessage();
 
-  state: IManageInventoryViewState = {
+  state: IManageStockViewState = {
     tradeItems: [],
     itemsMessageState: this.itemTracker.getState(),
     selectedItemId: undefined,
@@ -66,12 +71,12 @@ export class ManageInventoryView extends React.Component<{}, IManageInventoryVie
   }
 
   private onUpdate = async () => {
-    const { selectedItemId, delta, desc  } = this.state;
+    const { selectedItemId, delta, desc } = this.state;
 
     let deltaN = +delta!;
     let selectedItemIdN = +selectedItemId!;
 
-    if (!selectedItemId || !deltaN || !desc) {
+    if (!selectedItemId || !deltaN) {
       simpleErrorAlert("Please fill all the fields");
       return;
     }
@@ -81,7 +86,10 @@ export class ManageInventoryView extends React.Component<{}, IManageInventoryVie
       return;
     }
 
-    const result = await window.SystemBackend.sendMessage(new AllMessages.Stock.Update(selectedItemIdN, deltaN, desc));
+    const result = await window.SystemBackend.sendMessage(new MSG.Stock.UpdateStock({ id: selectedItemIdN }, {
+      delta_units: deltaN,
+      description: desc
+    }));
 
     if (!isResponseSuccessful(result)) {
       simpleErrorAlert(formatResponseErrorUser(result));
@@ -168,4 +176,3 @@ export class ManageInventoryView extends React.Component<{}, IManageInventoryVie
     );
   }
 }
-*/

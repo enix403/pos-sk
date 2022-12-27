@@ -26,7 +26,8 @@ import {
 } from '@/utils'
 import { Identified } from '@shared/tsutils';
 
-import { StoreItemFamily, IStoreItemAttribute, IStoreItem } from '@shared/contracts/IStoreItem';
+import { StoreItemFamily, IStoreItemAttribute, IStoreItem, availableUnits } from '@shared/contracts/IStoreItem';
+import { IItemStock } from '@shared/contracts/IItemStock';
 import { MSG } from '@shared/communication';
 import { MessageTracker } from '@/features/MessageTracker';
 import * as omaps from '@/features/object_maps';
@@ -162,7 +163,6 @@ class AttributesList extends React.Component<{}, AttributesList.State> {
     if (this.state.currentlyEditingID == id)
       this.setState({ currentlyEditingID: null });
   }
-
 
   render() {
     return (
@@ -413,15 +413,11 @@ class StoreItemForm extends React.Component<StoreItemForm.Props, StoreItemForm.S
           <Col lg={7}>
             <FormGroup label="Selling Unit">
               <Field name="unit">
-                {({ input: { multiple, ...restInput } }) => (<HTMLSelect fill={true} {...restInput}>
-                  <option value="piece">Piece</option>
-                  <option value="mt">Meters</option>
-                  <option value="in">Inches</option>
-                  <option value="kg">Kilograms</option>
-                  <option value="gm">Grams</option>
-                  <option value="lt">Litres</option>
-                  <option value="oz">Ounces</option>
-                </HTMLSelect>)}
+                {({ input: { multiple, ...restInput } }) => (
+                  <HTMLSelect fill={true} {...restInput}>
+                    {availableUnits.map(desc => (<option key={desc.slug} value={desc.slug}>{desc.title}</option>))}
+                  </HTMLSelect>
+                )}
               </Field>
             </FormGroup>
           </Col>
@@ -490,7 +486,7 @@ namespace StoreItemForm {
       attributes: payload.attributes,
       active: true,
 */
-const StoreItemsList: React.FC<{ rows: Identified<IStoreItem>[] }> = ({ rows }) => {
+const StoreItemsList: React.FC<{ rows: Identified<IItemStock>[] }> = ({ rows }) => {
   return (
     <div className="table-wrapper">
       <div className="table-header">
@@ -519,16 +515,16 @@ const StoreItemsList: React.FC<{ rows: Identified<IStoreItem>[] }> = ({ rows }) 
           </thead>
           <tbody>
             {rows.map(row =>
-              <tr key={row.id}>
-                <td>{row.pcode_std != "none" ? row.pcode : "-none-"}</td>
-                <td>{row.name}</td>
+              <tr key={row.item.id}>
+                <td>{row.item.pcode_std != "none" ? row.item.pcode : "-none-"}</td>
+                <td>{row.item.name}</td>
                 <td className="al" style={{ maxWidth: "150px", whiteSpace: "normal" }}>
-                  {omaps.SItemAttrListText(row)}
+                  {omaps.SItemAttrListText(row.item)}
                 </td>
-                <td>{omaps.SItemFamilyText(row.family)}</td>
-                <td>{omaps.SItemUnitText(row.unit)}</td>
-                <td>{row.price_per_unit}</td>
-                <td>{row.active ? "Yes" : "No"}</td>
+                <td>{omaps.SItemFamilyText(row.item.family)}</td>
+                <td>{omaps.SItemUnitText(row.item.unit)}</td>
+                <td>{row.item.price_per_unit}</td>
+                <td>{row.item.active ? "Yes" : "No"}</td>
               </tr>
             )}
           </tbody>
@@ -541,14 +537,14 @@ const StoreItemsList: React.FC<{ rows: Identified<IStoreItem>[] }> = ({ rows }) 
 namespace ManageStoreItemsView {
   export interface State {
     storeItemsMsg: MessageTracker.State;
-    allStoreItems: Identified<IStoreItem>[];
+    allStoreItems: Identified<IItemStock>[];
   }
 }
 export class ManageStoreItemsView extends React.Component<{}, ManageStoreItemsView.State> {
 
-  private getStoreItems = new MessageTracker(new MSG.Stock.GetStoreItems());
+  private getStocks = new MessageTracker(new MSG.Stock.GetStocks());
 
-  private onItemsReceived: MessageTracker.HandlerAlias<typeof this.getStoreItems> = (res, msgState) => {
+  private onItemsReceived: MessageTracker.HandlerAlias<typeof this.getStocks> = (res, msgState) => {
     this.setState({
       storeItemsMsg: msgState,
     });
@@ -569,7 +565,7 @@ export class ManageStoreItemsView extends React.Component<{}, ManageStoreItemsVi
   }
 
   public state: ManageStoreItemsView.State = {
-    storeItemsMsg: this.getStoreItems.getState(),
+    storeItemsMsg: this.getStocks.getState(),
     allStoreItems: []
   };
 
@@ -594,11 +590,11 @@ export class ManageStoreItemsView extends React.Component<{}, ManageStoreItemsVi
     }
 
     simpleSuccessAlert("Item added successfully");
-    this.getStoreItems.sendMessage();
+    this.getStocks.sendMessage();
   }
 
   componentDidMount() {
-    this.getStoreItems.watch(this.onItemsReceived);
+    this.getStocks.watch(this.onItemsReceived);
   }
 
   render() {

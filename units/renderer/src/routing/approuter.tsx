@@ -6,7 +6,7 @@ import { NotFoundView } from '@/components/NotFoundView';
 
 import { HomeView } from '@/features/home/HomeView'
 // import { ManageTradeItemsView } from '@/features/stock/ManageTradeItems'
-// import { ManageInventoryView } from '@/features/stock/ManageInventory'
+import { ManageStockView } from '@/features/stock/ManageStock'
 import { ManageStoreItemsView } from '@/features/stock/ManageStoreItems';
 import { CartView } from '@/features/customer/Cart';
 
@@ -20,7 +20,7 @@ export const AppRouter: React.FC<{}> = React.memo(_ => {
 
         <Route path={appRoutes.home.path} component={HomeView} />
         {/*<Route path={appRoutes.stock.tradeItems.path} component={ManageTradeItemsView} />*/}
-        {/*<Route path={appRoutes.stock.inventory.path} component={ManageInventoryView} />*/}
+        <Route path={appRoutes.stock.updateStock.path} component={ManageStockView} />
         <Route path={appRoutes.stock.storeItems.path} component={ManageStoreItemsView} />
         <Route path={appRoutes.customer.cart.path} component={CartView} />
 

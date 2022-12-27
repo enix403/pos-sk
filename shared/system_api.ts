@@ -8,7 +8,7 @@ export interface ISystemBackendAPI {
         message: any
     ): Promise<ChannelResponse<any>>;
 
-    sendMessage<T, K>(
-        message: Message<T, K>
+    sendMessage<K>(
+        message: Message<any, K>
     ): Promise<ChannelResponse<K>>;
 }
