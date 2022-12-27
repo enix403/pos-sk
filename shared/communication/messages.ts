@@ -6,6 +6,7 @@ import { Message } from './interfaces';
 import { IStoreItem } from '../contracts/IStoreItem';
 import { IStockUpdatePayload } from '@shared/contracts/IStockUpdate';
 import { IItemStock } from '@shared/contracts/IItemStock';
+import { SaleMethod } from '@shared/contracts/ISale';
 
 abstract class SimpleMessage<T, K> extends Message<T, K> {
     constructor(payload: T) {
@@ -60,27 +61,28 @@ export namespace MSG {
         /* =========================== */
 
         namespace CreateSaleX {
-            export interface MetaData {
-                customer_name: string | null;
-                amount_paid: number;
-            }
-            export interface CartItem {
-                item: Identified<Partial<IStoreItem>>,
-                unit_count: number;
-            }
+            export interface Capture {
+                meta: {
+                    method: SaleMethod,
+                    customer_id: number | null, /* TODO: Devise a proper mechanism for transferring ids of entities */
+                    amount_paid: number
+                };
+                cart: CartItems[];
+            };
+        };
 
-            export interface Capture { cart: CartItem[], metadata: MetaData };
-        }
-
-        export class CreateSale extends Message<CreateSaleX.Capture, void> {
-            static ACTION_NAME = "sale:new";
-            constructor(cart: CreateSaleX.CartItem[], metadata: CreateSaleX.MetaData) {
-                super();
-                this.payload = { cart, metadata };
-            }
-        }
+        export class CreateSale extends SimpleMessage<CreateSaleX.Capture, void>
+        { static ACTION_NAME = "sale:new"; }
 
         /* =========================== */
+    }
+
+    /* ============================================ */
+    /* ============================================ */
+
+    export namespace Customer {
+        export class AddCustomer extends SimpleMessage<{ name: string }, void>
+        { static ACTION_NAME = 'cust:add'; }
     }
 
     /* ============================================ */

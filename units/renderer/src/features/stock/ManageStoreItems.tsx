@@ -422,14 +422,33 @@ class StoreItemForm extends React.Component<StoreItemForm.Props, StoreItemForm.S
             </FormGroup>
           </Col>
           <Col md={16} lg={9}>
-            <Field name="price_per_unit" validate={composeValidators(mustBeNumber, required, minValue(1))}>
+            <Field name="cost_price" validate={composeValidators(mustBeNumber, required, minValue(1))}>
               {({ input, meta }) => {
                 const { intent, hasError } = processMeta(meta);
                 return (
-                  <FormGroup label="Sale Price per Unit" intent={intent} helperText={hasError && meta.error}>
+                  <FormGroup label="Cost Price" intent={intent} helperText={hasError && meta.error}>
                     <InputGroup
                       type="number"
-                      placeholder="Enter sale price"
+                      placeholder="Enter cost price"
+                      fill
+                      leftIcon='dollar'
+                      intent={intent}
+                      {...input}
+                    />
+                  </FormGroup>
+                );
+              }}
+            </Field>
+          </Col>
+          <Col md={16} lg={9}>
+            <Field name="retail_price" validate={composeValidators(mustBeNumber, required, minValue(1))}>
+              {({ input, meta }) => {
+                const { intent, hasError } = processMeta(meta);
+                return (
+                  <FormGroup label="Retail Price" intent={intent} helperText={hasError && meta.error}>
+                    <InputGroup
+                      type="number"
+                      placeholder="Enter retail price"
                       fill
                       leftIcon='dollar'
                       intent={intent}
@@ -452,7 +471,8 @@ namespace StoreItemForm {
     description?: string;
     family?: StoreItemFamily;
     unit?: string;
-    price_per_unit?: number;
+    cost_price?: number;
+    retail_price?: number;
   }
 
   export interface Action extends Required<Values> {
@@ -475,17 +495,6 @@ namespace StoreItemForm {
   export type FormRenderPropType = FormRenderProps<Values>;
 }
 
-/*
-      pcode_std: payload.pcode_enabled ? "ucp" : "none",
-      pcode: payload.pcode,
-      name: payload.name,
-      description: payload.description,
-      family: payload.family,
-      unit: payload.unit,
-      price_per_unit: payload.price_per_unit,
-      attributes: payload.attributes,
-      active: true,
-*/
 const StoreItemsList: React.FC<{ rows: Identified<IItemStock>[] }> = ({ rows }) => {
   return (
     <div className="table-wrapper">
@@ -509,7 +518,8 @@ const StoreItemsList: React.FC<{ rows: Identified<IItemStock>[] }> = ({ rows }) 
               <th>Attributes</th>
               <th>Family</th>
               <th>Unit</th>
-              <th>Price/Unit</th>
+              <th>Cost Price</th>
+              <th>Retail Price</th>
               <th>Active</th>
             </tr>
           </thead>
@@ -523,7 +533,8 @@ const StoreItemsList: React.FC<{ rows: Identified<IItemStock>[] }> = ({ rows }) 
                 </td>
                 <td>{omaps.SItemFamilyText(row.item.family)}</td>
                 <td>{omaps.SItemUnitText(row.item.unit)}</td>
-                <td>{row.item.price_per_unit}</td>
+                <td>{row.item.cost_price}</td>
+                <td>{row.item.retail_price}</td>
                 <td>{row.item.active ? "Yes" : "No"}</td>
               </tr>
             )}
@@ -572,13 +583,17 @@ export class ManageStoreItemsView extends React.Component<{}, ManageStoreItemsVi
   private onItemSave = async (payload: StoreItemForm.Action) => {
 
     const res = await window.SystemBackend.sendMessage(new MSG.Stock.CreateStoreItem({
-      pcode_std: payload.pcode_enabled ? "ucp" : "none",
+      pcode_std: payload.pcode_enabled ? "upc" : "none",
       pcode: payload.pcode,
       name: payload.name,
       description: payload.description,
       family: payload.family,
       unit: payload.unit,
-      price_per_unit: payload.price_per_unit,
+
+      // : payload.price_per_unit,
+      cost_price: payload.cost_price,
+      retail_price: payload.retail_price,
+
       attributes: payload.attributes,
       active: true,
     }));

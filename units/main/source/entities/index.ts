@@ -9,6 +9,8 @@ import { Sale, SaleSchema, SaleItem, SaleItemSchema } from './Sale'
 import { StockUpdate, StockUpdateSchema } from './StockUpdate'
 import { ItemStock, ItemStockSchema } from './ItemStock'
 
+import { Customer, CustomerSchema } from './Customer'
+
 const allEntities = [
   SimpleEntitySchema,
 
@@ -18,15 +20,19 @@ const allEntities = [
   SaleItemSchema,
   StockUpdateSchema,
   ItemStockSchema,
+  CustomerSchema,
 ];
 
 export {
+  SimpleEntity,
+
   StoreItem,
   StoreItemAttribute,
   Sale,
   SaleItem,
   StockUpdate,
-  ItemStock
+  ItemStock,
+  Customer,
 };
 
 export default allEntities;
@@ -38,6 +44,10 @@ export type ModelRelation<T> = {
   | IdentifiedReference<any>
   ? P : never
 }[keyof T];
+
+export type EntityClass<T extends SimpleEntity> = {
+    new(...args): T
+}
 
 // It's kinda ugly to have `['somerelation'] as ModelRelation<SomeEntity>[]` floating everywhere.
 export function entt_relation_list<T extends SimpleEntity>(

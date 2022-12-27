@@ -1,5 +1,9 @@
 import { IStoreItem, StoreItemFamily, availableUnits } from '@shared/contracts/IStoreItem';
 
+
+/**
+ * Converts an item-unit to its string representation
+ * */
 export function SItemUnitText(unitSlug: string): string {
     const result = availableUnits.find(unit => unit.slug == unitSlug);
     if (result != undefined)
@@ -8,6 +12,9 @@ export function SItemUnitText(unitSlug: string): string {
     return unitSlug;
 }
 
+/**
+ * Converts StoreItemFamily to its string representation
+ * */
 export function SItemFamilyText(f: StoreItemFamily): string {
     switch(f) {
         case StoreItemFamily.TradeItem: return 'Trade Item'

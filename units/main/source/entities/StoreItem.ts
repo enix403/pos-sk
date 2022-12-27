@@ -19,10 +19,11 @@ export class StoreItem extends SimpleEntity {
     public family: StoreItemFamily;
 
     public unit: string;
-    public price_per_unit: number;
-    public active: boolean;
+    public cost_price: number;
+    public retail_price: number;
 
     public attributes: Collection<StoreItemAttribute>;
+    public active: boolean;
 }
 
 export class StoreItemAttribute extends SimpleEntity {
@@ -43,7 +44,8 @@ export const StoreItemSchema = new EntitySchema<StoreItem, SimpleEntity>({
         family: { type: String, nullable: false },
 
         unit: { type: String, nullable: false },
-        price_per_unit: { type: Number, unsigned: false, nullable: false },
+        cost_price: { type: Number, unsigned: false, nullable: false },
+        retail_price: { type: Number, unsigned: false, nullable: false },
         active: { type: Boolean, nullable: false, default: false },
 
         attributes: CreateInverseManyEnttRef(() => StoreItemAttribute, attibute => attibute.item)

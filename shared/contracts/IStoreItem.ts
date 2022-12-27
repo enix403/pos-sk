@@ -35,7 +35,9 @@ export interface IStoreItem {
     description: string;
 
     unit: string;
-    price_per_unit: number;
+    cost_price: number;
+    retail_price: number;
+
     active: boolean;
 
     attributes: IterableArrayLike<IStoreItemAttribute>;

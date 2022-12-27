@@ -1,7 +1,9 @@
 import { Reference } from '@mikro-orm/core';
 import { IpcChannel, MsgDispatch } from "@/channel";
+import { ChannelError } from "@/channel/exceptions";
 
 import { MSG } from "@shared/communication";
+import { SaleMethod } from "@shared/contracts/ISale";
 
 import { EFORK } from "@/database";
 import {
@@ -11,33 +13,42 @@ import {
 import { sleep } from '@shared/commonutils'
 import { logger } from '@/logging'
 
-
-import { Sale, SaleItem } from '@/entities'
+import { Sale, SaleItem, Customer } from '@/entities'
 
 export class SaleChannel extends IpcChannel {
     constructor() {
         super();
 
         this.register(this.newSale);
-
-        this.register(this.demo);
     }
 
-    private demo = new MsgDispatch(MSG.Dummy, async () => {
-    });
-
     private newSale = new MsgDispatch(MSG.Sale.CreateSale, async (payload) => {
-        const { cart, metadata } = payload;
+        const { cart, meta } = payload;
 
         if (cart.length == 0)
             return;
 
         const em = EFORK();
+
         const sale = em.create(Sale, {
-            customer_name: metadata.customer_name,
-            amount_total: 0, /* Calculated later below */
-            amount_paid: metadata.amount_paid
+            method: meta.method,
         });
+
+        // Record the customer if the sale is a credit sale
+        if (meta.method == SaleMethod.Credit) {
+            let customer: Customer;
+            try {
+                customer = await em.findOneOrFail(Customer, { id: meta.customer_id });
+            }
+            catch (e) {
+                throw new ChannelError("Invalid customer reference.");
+            }
+
+            sale.customer = Reference.create(customer);
+        }
+        else {
+            sale.customer = null;
+        }
 
         // Preload the required items
         const cartItemIds = cart.map(cartItem => cartItem.item.id);
@@ -51,10 +62,11 @@ export class SaleChannel extends IpcChannel {
             const saleItemObject = em.create(SaleItem, {
                 item: Reference.create(storeItem),
                 item_unit_count: cartItem.unit_count,
-                item_unit_price: storeItem.price_per_unit
+                item_cost_price: storeItem.cost_price,
+                item_retail_price: storeItem.retail_price,
             });
 
-            totalAmount += saleItemObject.item_unit_count * saleItemObject.item_unit_price;
+            totalAmount += saleItemObject.item_unit_count * saleItemObject.item_retail_price;
 
             sale.cart.add(saleItemObject);
         }
