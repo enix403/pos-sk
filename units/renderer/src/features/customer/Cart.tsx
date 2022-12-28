@@ -21,10 +21,10 @@ function Row() {
           <p><Tag minimal intent="danger">#QUE-003443-AH-34-005</Tag></p>
           <h3 className="name">Soap 34</h3>
 
-          <p className="bp3-text-muted bp3-text-small"><span className="margin-r-s">COLOR:</span>GREEN</p>
-          <p className="bp3-text-muted bp3-text-small"><span className="margin-r-s">SIZE:</span>LARGE</p>
-          <p className="bp3-text-muted bp3-text-small"><span className="margin-r-s">VARIANT:</span>A</p>
-          <p className="bp3-text-muted bp3-text-small"><span className="margin-r-s">TYPE:</span>BOTTLE</p>
+          {/*<p className="bp3-text-muted bp3-text-small"><span className="margin-r-s">COLOR:</span>GREEN</p>*/}
+          {/*<p className="bp3-text-muted bp3-text-small"><span className="margin-r-s">SIZE:</span>LARGE</p>*/}
+          {/*<p className="bp3-text-muted bp3-text-small"><span className="margin-r-s">VARIANT:</span>A</p>*/}
+          {/*<p className="bp3-text-muted bp3-text-small"><span className="margin-r-s">TYPE:</span>BOTTLE</p>*/}
         </div>
         <div className="right">
           <FormGroup label="Quantity" className="quantity">

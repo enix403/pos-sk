@@ -21,9 +21,9 @@ export const App = () => {
   return (
     <ScreenClassProvider>
       <Router history={history}>
-        <Sidebar />
+        {/*<Sidebar />*/}
         <AppRouter />
-        <StatusBar />
+        {/*<StatusBar />*/}
       </Router>
     </ScreenClassProvider>
   );
