@@ -13,7 +13,7 @@
     // background-color: #3D4854;
     border-right: 3px solid #181A1B;
 
-    width: 15%;
+    width: 20%;
     min-width: 350px;
 
     display: flex;
@@ -55,24 +55,38 @@
             justify-content: space-between;
         }
 
-        .fin-row {
-            padding-bottom: 4px;
-            border-bottom: 1px solid #8a8a8a;
 
+        .fin-row {
+            padding-bottom: 8px;
+            border-bottom: 1px solid #8a8a8a;
             .t {
                 text-transform: uppercase;
                 color: #C5CBD3;
                 font-weight: 400;
-                font-size: 18px;
+                font-size: 17px;
             }
             .v {
                 font-weight: 700;
-                font-size: 19px;
+                font-size: 18px;
+                font-family: 'Fira Code';
             }
         }
 
+        @mixin money-highlight($hColor) {
+            border-color: $hColor !important;
+            .t, .v {
+                color: $hColor !important;
+            }
+        }
+
+
+        .fin-row.money-highlight { @include money-highlight(#83F6C4); }
+        .fin-row.money-highlight-alt { @include money-highlight(#FFD97D); }
+        .fin-row.money-highlight-err { @include money-highlight(#FF9B85); }
+
         .sale-method-radio {
             margin-top: 24px;
+            margin-bottom: 24px;
             background-color: #2F3943;
             padding: 12px 16px 2px;
             border-radius: 7px;
