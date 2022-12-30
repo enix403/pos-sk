@@ -1,20 +1,21 @@
+@import '@fontsource/fira-code/latin-700.css';
+
 .new-sale-view {
     height: 100%;
     width: 100%;
 
     /* Row Flex */
     display: flex;
-    flex-direction: row-reverse;
+    flex-direction: row;
     align-items: stretch;
 }
 
-.new-sale-view .left-panel {
+.new-sale-view .bar-panel {
     background-color: #3D4854;
-    // background-color: #3D4854;
-    border-right: 3px solid #181A1B;
+    border-right: 2px solid #181A1B;
 
     width: 20%;
-    min-width: 350px;
+    min-width: 300px;
 
     display: flex;
     flex-direction: column;
@@ -31,19 +32,10 @@
     }
 }
 
-.new-sale-view .left-panel {
-    .add-item {
-        flex: 1.3;
-        margin-top: 16px;
-        padding: 0 16px;
-    }
+.new-sale-view .bar-panel {
+    padding: 16px 20px 0;
 
     .financials {
-        flex: 2;
-        margin: 0 12px;
-        padding: 16px 8px 0;
-        border-top: 2px solid #8a8a8a;
-
         .fin-row-margin {
             margin: 0 12px 0;
             margin-bottom: 16px;
@@ -80,7 +72,8 @@
         }
 
 
-        .fin-row.money-highlight { @include money-highlight(#83F6C4); }
+        // .fin-row.money-highlight { @include money-highlight(#83F6C4); }
+        .fin-row.money-highlight { @include money-highlight(#96ffd2); }
         .fin-row.money-highlight-alt { @include money-highlight(#FFD97D); }
         .fin-row.money-highlight-err { @include money-highlight(#FF9B85); }
 
@@ -94,7 +87,7 @@
     }
 }
 
-.new-sale-view .right-panel {
+.new-sale-view .cart-panel {
     background-color: #F8F9FA;
     flex: 1;
 
@@ -137,11 +130,11 @@
     }
 
     .quantity {
-        margin-left: 16px;
+        // margin-left: 16px;
         margin-right: 16px;
     }
     .quantity .bp3-input-group {
-        width: 250px;
+        width: 170px;
     }
 }
 

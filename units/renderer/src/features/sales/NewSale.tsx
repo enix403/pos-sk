@@ -19,6 +19,8 @@ import {
   Spinner,
 } from '@blueprintjs/core'
 
+import { CreditCustomerSelect } from './CreditCustomerSelect';
+
 import { numberWithCommas } from './utility'
 
 class AddByNamePanel extends React.Component {
@@ -71,7 +73,6 @@ const AddItem = () => {
 };
 
 const financialInputProps = {
-  fill: true,
   allowNumericCharactersOnly: true,
   clampValueOnBlur: true,
   minorStepSize: null,
@@ -110,7 +111,7 @@ class Financials extends React.Component<any, IFinancialsState> {
         <FormGroup label="Amount Paid">
           <NumericInput
             {...financialInputProps}
-            large
+            large fill
             leftIcon='folder-open'
             placeholder="Enter amout paid"
             intent='primary'
@@ -127,6 +128,10 @@ class Financials extends React.Component<any, IFinancialsState> {
     );
   }
 
+  renderCreditCustomerForm() {
+    return <CreditCustomerSelect />;
+  }
+
   render() {
 
     const { method, discount, billAmount } = this.state;
@@ -137,15 +142,21 @@ class Financials extends React.Component<any, IFinancialsState> {
       <div className='financials bp3-dark'>
         <h4 className="bp3-heading header-margin-b-l">Transaction</h4>
 
-        <p className="fin-row fin-row-margin">
+        <div className="fin-row fin-row-margin">
+          <span className="t">Item Count</span>
+          <span className="v">52</span>
+        </div>
+        <div className="fin-row fin-row-margin">
           <span className="t">Bill Amount</span>
           <span className="v">{numberWithCommas(billAmount)}</span>
-        </p>
-        <p className="discount-row fin-row-margin">
+        </div>
+
+        <div className="discount-row fin-row-margin">
           <span className="margin-r-l">Discount</span>
           <NumericInput
             {...financialInputProps}
             max={billAmount}
+            fill
             buttonPosition='none'
             leftIcon='eraser'
             placeholder="Enter discount"
@@ -154,7 +165,7 @@ class Financials extends React.Component<any, IFinancialsState> {
             onValueChange={d => this.setDiscount( isNaN(d) ? 0 : d )}
             value={discount}
           />
-        </p>
+        </div>
 
         <p className="money-highlight fin-row fin-row-margin">
           <span className="t">Total Payable</span>
@@ -172,23 +183,22 @@ class Financials extends React.Component<any, IFinancialsState> {
             <Radio large label="Credit" value="credit" />
         </RadioGroup>
 
-        {method == 'cash' ? this.renderAmountPaidForm() : null}
+        {method == 'cash' ? this.renderAmountPaidForm() : this.renderCreditCustomerForm()}
 
       </div>
     );
   }
 };
 
-function buildAttrFragment(attr, index)
-{
+function buildAttrFragment(attr, index) {
   const [name, value] = attr;
   return (
-    <>
+    <React.Fragment key={index}>
       { index != 0 ? ' - ' : null }
       <strong>{name}:</strong>
       {' '}
       {value}
-    </>
+    </React.Fragment>
   );
 }
 
@@ -201,18 +211,17 @@ const CartItem = ({ i }) => {
 
   return (
     <div className='cart-item'>
-        <Tag minimal intent="success">#QUE-003443-AH-34-005</Tag>
-        <NumericInput
-          className="quantity"
-          rightElement={<Tag minimal intent="primary">x Rs. 1240</Tag>}
-          leftIcon='shopping-cart'
-          placeholder={"Qty"}
-        />
-        <span className='itm-name'>Some Item {i}</span>
-        <p className="itm-attrs">
-          {attrs.map(buildAttrFragment)}
-        </p>
-        <Button icon="cross" intent="danger" minimal={true} />
+      <NumericInput
+        {...financialInputProps}
+        className="quantity"
+        rightElement={<Tag minimal intent="primary">x Rs. 1240</Tag>}
+        placeholder={"Qty"}
+      />
+      <span className='itm-name'>Some Item {i}</span>
+      <p className="itm-attrs">
+        {attrs.map(buildAttrFragment)}
+      </p>
+      <Button icon="cross" intent="danger" minimal={true} />
     </div>
   );
 };
@@ -244,19 +253,19 @@ class CartView extends React.Component {
   render() {
     return (
       <>
-        <div className="left-panel">
-          <AddItem />
-          <Financials />
-        </div>
-
-        <div className="right-panel">
+        <div className="cart-panel">
           <CartListPanel />
+        </div>
+        <div className="bar-panel">
+          <AddItem />
+        </div>
+        <div className="bar-panel">
+          <Financials />
         </div>
       </>
     );
   }
 };
-
 
 export class NewSaleView extends React.Component {
   render() {
@@ -267,3 +276,4 @@ export class NewSaleView extends React.Component {
     );
   }
 }
+
