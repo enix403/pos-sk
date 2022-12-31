@@ -248,32 +248,55 @@ const CartListPanel = () => {
   );
 };
 
+const ScanStatusButton = ({ scanActive }) => {
+  return (
+    <>
+    {scanActive ?
+      <Tag
+        fill
+        icon="small-tick"
+        minimal
+        intent="success"
+      >
+        <div className="scan-tag">
+          <strong>Scanning</strong>
+        </div>
+      </Tag> :
+      <Button
+        fill
+        // large
+        intent="danger"
+        text="Click to scan"
+      />
+     }
+    </>
+  );
+}
 
-class CartView extends React.Component {
-  render() {
-    return (
-      <>
-        <div className="cart-panel">
-          <CartListPanel />
-        </div>
-        <div className="bar-panel">
-          <AddItem />
-        </div>
-        <div className="bar-panel">
-          <Financials />
-        </div>
-      </>
-    );
-  }
-};
-
-export class NewSaleView extends React.Component {
-  render() {
-    return (
-      <div className='new-sale-view'>
-        <CartView />
+const CartView = () => {
+  return (
+    <>
+      <div className="cart-panel">
+        <CartListPanel />
       </div>
-    );
-  }
+      <div className="bar-panel">
+        <AddItem />
+        <div className="scan-status bp3-dark">
+          <ScanStatusButton scanActive={true} />
+        </div>
+      </div>
+      <div className="bar-panel">
+        <Financials />
+      </div>
+    </>
+  );
+}
+
+export const NewSaleView = () => {
+  return (
+    <div className='new-sale-view'>
+      <CartView />
+    </div>
+  );
 }
 

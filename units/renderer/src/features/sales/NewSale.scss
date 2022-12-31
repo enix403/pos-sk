@@ -138,3 +138,17 @@
     }
 }
 
+/* ------------------------------ */
+.bar-panel .scan-status {
+    margin-top: auto; /* Push it to the end of flex container  */
+    margin-bottom: 16px;
+
+    .scan-tag {
+        display: flex;
+        justify-content: center;
+        font-size: 1.02rem;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        margin: 6px 0;
+    }
+}
