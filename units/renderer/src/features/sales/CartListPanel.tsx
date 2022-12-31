@@ -32,7 +32,7 @@ const CartItemView = observer(({ item }: { item: CartItem }) => (
       {...financialInputProps}
       intent={item.quantity <= 0 ? 'danger' : 'none' }
       className="quantity number-bold-input"
-      rightElement={<Tag minimal intent="primary">x Rs. 1240</Tag>}
+      rightElement={<Tag minimal intent="primary">x Rs. {item.price}</Tag>}
       placeholder={"Qty"}
       value={item.quantity}
       onValueChange={p => item.setQuantity(p)}

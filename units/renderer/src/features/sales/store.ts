@@ -10,13 +10,15 @@ import { DUMMY_ITEMS } from './temp_items'
 type ItemResource = Identified<IStoreItem>;
 
 export class CartItem {
+    store: CartStore
     itemResource: ItemResource;
     quantity: number;
-    store: CartStore
+    price: number;
 
     constructor(store: CartStore, item: ItemResource) {
         this.store = store;
         this.itemResource = item;
+        this.price = item.retail_price;
         this.quantity = 1;
 
         makeAutoObservable(this, {
@@ -70,6 +72,10 @@ class CartStore {
     get itemCount() {
         return this.items.reduce((acc, item) => acc + item.quantity, 0);
     }
+
+    get billAmount() {
+        return this.items.reduce((acc, item) => acc + item.quantity * item.price, 0);
+    }
 }
 
 
@@ -78,5 +84,16 @@ export const cartStore = new CartStore();
 window.store = cartStore;
 // @ts-ignore
 window.di = DUMMY_ITEMS;
+
+
+cartStore.addItem(DUMMY_ITEMS[0]);
+cartStore.addItem(DUMMY_ITEMS[0]);
+cartStore.addItem(DUMMY_ITEMS[1]);
+cartStore.addItem(DUMMY_ITEMS[2]);
+cartStore.addItem(DUMMY_ITEMS[2]);
+cartStore.addItem(DUMMY_ITEMS[1]);
+cartStore.addItem(DUMMY_ITEMS[3]);
+cartStore.addItem(DUMMY_ITEMS[0]);
+
 
 export const CartStoreContext = createContext<CartStore | undefined>(undefined);

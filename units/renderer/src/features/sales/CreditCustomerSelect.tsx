@@ -34,9 +34,9 @@ const filterCustomer = (query, customer, _index, exactMatch) => {
 };
 
 const renderCustomer = (customer, { handleClick, modifiers }) => {
-  if (!modifiers.matchesPredicate) {
+  if (!modifiers.matchesPredicate)
     return null;
-  }
+
   return (
     <MenuItem
       active={modifiers.active}
@@ -48,10 +48,7 @@ const renderCustomer = (customer, { handleClick, modifiers }) => {
   );
 };
 
-export const CreditCustomerSelect = () => {
-
-  const [cust, setCust] = React.useState(null);
-
+export const CreditCustomerSelect = ({value, setValue}) => {
   return (
     <FormGroup label="Customer Name">
       <Suggest<any>
@@ -61,7 +58,8 @@ export const CreditCustomerSelect = () => {
         inputProps={{ large: true, leftIcon: 'person'}}
         items={ALL_CUSTOMERS}
         itemRenderer={renderCustomer}
-        onItemSelect={(c) => setCust(c)}
+        selectedItem={value}
+        onItemSelect={(c) => setValue(c)}
         inputValueRenderer={(customer) => customer.name}
         itemsEqual={(a, b) => a.id == b.id}
         itemPredicate={filterCustomer}
