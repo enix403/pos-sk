@@ -8,6 +8,7 @@
         "tscript": "ts-node -r dotenv/config -r tsconfig-paths/register -P ts-node.tsconfig.json",
         "typecheck": "yarn run tsc --noEmit",
         "start": "vite --mode development",
+        "build:dev": "vite build --mode development",
         "build": "tsc && vite build --mode production",
         "serve:prod": "vite preview --mode development"
     },

@@ -1,14 +1,6 @@
-/**
- * index.tsx
- *
- * This is the entry file for the application, only setup and boilerplate
- * code.
- */
-
-
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { App } from './App';
+import { AppSystem } from './AppSystem';
 import { setupDevSystemApi } from './devapi';
 
 import reportWebVitals from 'reportWebVitals';
@@ -19,7 +11,7 @@ const MOUNT_NODE = document.getElementById('root') as HTMLElement;
 
 ReactDOM.render(
     <React.StrictMode>
-        <App />
+      <AppSystem />
     </React.StrictMode>,
     MOUNT_NODE
 );

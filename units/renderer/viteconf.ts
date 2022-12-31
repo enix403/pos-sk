@@ -25,7 +25,15 @@ export default defineConfig(({ mode }) => {
             target: "modules",
             sourcemap: isDevelopment,
             minify: !isDevelopment && 'esbuild',
-            chunkSizeWarningLimit: 1000
+            chunkSizeWarningLimit: 1000,
+
+            rollupOptions: {
+                input: {
+                    bundle_system: 'index_system.html',
+                    bundle_pos: 'index_pos.html'
+                },
+            },
+
         },
 
         server: {

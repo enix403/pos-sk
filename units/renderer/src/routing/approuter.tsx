@@ -10,8 +10,6 @@ import { ManageStockView } from '@/features/stock/ManageStock'
 import { ManageStoreItemsView } from '@/features/stock/ManageStoreItems';
 import { CartView } from '@/features/customer/Cart';
 
-import { NewSaleView } from '@/features/sales/NewSale'
-
 import { ScratchPlace } from '@/features/_scratch/scratch-place';
 
 export const AppRouter: React.FC<{}> = React.memo(_ => {
@@ -25,9 +23,6 @@ export const AppRouter: React.FC<{}> = React.memo(_ => {
         <Route path={appRoutes.stock.updateStock.path} component={ManageStockView} />
         <Route path={appRoutes.stock.storeItems.path} component={ManageStoreItemsView} />
         <Route path={appRoutes.customer.cart.path} component={CartView} />
-
-
-        <Route path={'/new-sale'} component={NewSaleView} />
 
         <Route path={devAppRoutes.scratch.path} component={ScratchPlace} />
 
