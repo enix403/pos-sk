@@ -1,4 +1,19 @@
+@import '@fontsource/fira-code/latin-500.css';
 @import '@fontsource/fira-code/latin-700.css';
+
+.number-bold-input .bp3-input-group {
+    font-weight: 500;
+    font-family: 'Fira Code';
+}
+
+.vdivider {
+}
+
+.vdivider {
+    border-left: 2px solid #BD6BBD;
+    align-self: stretch;
+    margin: 2px 12px;
+}
 
 .new-sale-view {
     height: 100%;
@@ -108,8 +123,7 @@
 
             padding: 6px 6px;
 
-            border-top: 2px solid #e6e6e6;
-            &:first-child { border-top: none; }
+            border-bottom: 2px solid #e6e6e6;
         }
     }
 }

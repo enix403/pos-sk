@@ -1,5 +1,8 @@
 import React from 'react'
 
+import { action } from 'mobx'
+import { observer } from 'mobx-react'
+
 import {
   Tag,
   NumericInput,
@@ -8,62 +11,79 @@ import {
 } from '@blueprintjs/core'
 
 import { financialInputProps } from './common'
+import { CartItem, CartStoreContext } from './store'
 
-function buildAttrFragment(attr, index) {
-  const [name, value] = attr;
+import type { IStoreItemAttribute } from '@shared/contracts/IStoreItem'
+
+function buildAttrFragment(attr: IStoreItemAttribute, index: number) {
   return (
     <React.Fragment key={index}>
       { index != 0 ? ' - ' : null }
-      <strong>{name}:</strong>
+      <strong>{attr.name}:</strong>
       {' '}
-      {value}
+      {attr.value}
     </React.Fragment>
   );
 }
 
-const CartItem = ({ i }) => {
+const CartItemView = observer(({ item }: { item: CartItem }) => (
+  <div className='cart-item'>
+    <NumericInput
+      {...financialInputProps}
+      intent={item.quantity <= 0 ? 'danger' : 'none' }
+      className="quantity number-bold-input"
+      rightElement={<Tag minimal intent="primary">x Rs. 1240</Tag>}
+      placeholder={"Qty"}
+      value={item.quantity}
+      onValueChange={p => item.setQuantity(p)}
+    />
 
-  const attrs = [
-    ['Color', 'Red'],
-    ['Size', '120g']
-  ];
+    <span className='itm-name'>{item.itemResource.name}</span>
 
-  return (
-    <div className='cart-item'>
-      <NumericInput
-        {...financialInputProps}
-        className="quantity"
-        rightElement={<Tag minimal intent="primary">x Rs. 1240</Tag>}
-        placeholder={"Qty"}
-      />
-      <span className='itm-name'>Some Item {i}</span>
-      <p className="itm-attrs">
-        {attrs.map(buildAttrFragment)}
-      </p>
-      <Button icon="cross" intent="danger" minimal={true} />
-    </div>
-  );
-};
+    <p className="itm-attrs">
+      {(item.itemResource.attributes as [IStoreItemAttribute]).map(buildAttrFragment)}
+    </p>
 
-export const CartListPanel = () => {
+    <Button
+      icon="chevron-up"
+      intent="success"
+      minimal outlined
+      onClick={() => item.quantityInc()}
+    />
+    <div className="vdivider" />
+    <Button
+      icon="chevron-down"
+      intent="primary"
+      minimal outlined
+      disabled={item.quantity == 1}
+      onClick={() => item.quantityDec()}
+    />
+    <div className="vdivider" />
+    <Button
+      icon="cross"
+      intent="danger"
+      minimal outlined
+      onClick={() => item.remove()}
+    />
+  </div>
+));
+
+
+export const CartListPanel = observer(() => {
+
+  const store = React.useContext(CartStoreContext)!;
+
   return (
     <div className="cart-panel">
-
-      {/*<NonIdealState
-        icon={'shopping-cart'}
-        title={"No item added"}
-      />*/}
-      <div className='cart-item-list'>
-        <CartItem i={1} />
-        <CartItem i={2} />
-        <CartItem i={3} />
-        <CartItem i={4} />
-        <CartItem i={5} />
-        <CartItem i={6} />
-        <CartItem i={7} />
-        <CartItem i={8} />
-        <CartItem i={9} />
-      </div>
+      {store.items.length == 0 ?
+        <NonIdealState
+          icon={'shopping-cart'}
+          title={"No item added"}
+        /> :
+        <div className='cart-item-list'>
+          {store.items.map(item => <CartItemView item={item} key={item.itemResource.id} />)}
+        </div>
+      }
     </div>
   );
-};
+});

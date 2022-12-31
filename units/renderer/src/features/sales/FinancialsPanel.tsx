@@ -48,6 +48,7 @@ export class FinancialsPanel extends React.Component<any, IFinancialsState> {
           <NumericInput
             {...financialInputProps}
             large fill
+            className="number-bold-input"
             leftIcon='folder-open'
             placeholder="Enter amout paid"
             intent='primary'
@@ -96,6 +97,7 @@ export class FinancialsPanel extends React.Component<any, IFinancialsState> {
               fill
               buttonPosition='none'
               leftIcon='eraser'
+              className="number-bold-input"
               placeholder="Enter discount"
               intent='warning'
 
