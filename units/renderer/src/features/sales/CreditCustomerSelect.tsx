@@ -15,7 +15,9 @@ const flags = {
   resetOnSelect: false,
 };
 
-const ALL_CUSTOMERS = [
+export type CustomerResource = { id: number, name: string };
+
+const ALL_CUSTOMERS: CustomerResource[] = [
   {id: 1, name: "ABC 1"},
   {id: 2, name: "DEF 2"},
   {id: 3, name: "GHI 3"},
@@ -48,23 +50,21 @@ const renderCustomer = (customer, { handleClick, modifiers }) => {
   );
 };
 
-export const CreditCustomerSelect = ({value, setValue}) => {
-  return (
-    <FormGroup label="Customer Name">
-      <Suggest<any>
-        {...flags}
-        popoverProps={{ minimal: true }}
-        fill
-        inputProps={{ large: true, leftIcon: 'person'}}
-        items={ALL_CUSTOMERS}
-        itemRenderer={renderCustomer}
-        selectedItem={value}
-        onItemSelect={(c) => setValue(c)}
-        inputValueRenderer={(customer) => customer.name}
-        itemsEqual={(a, b) => a.id == b.id}
-        itemPredicate={filterCustomer}
-        noResults={<MenuItem disabled={true} text="No results." />}
-      />
-    </FormGroup>
-  );
-}
+export const CreditCustomerSelect = ({value, setValue}) => (
+  <FormGroup label="Customer Name">
+    <Suggest<any>
+      {...flags}
+      popoverProps={{ minimal: true }}
+      fill
+      inputProps={{ large: true, leftIcon: 'person'}}
+      items={ALL_CUSTOMERS}
+      itemRenderer={renderCustomer}
+      selectedItem={value}
+      onItemSelect={(c) => setValue(c)}
+      inputValueRenderer={(customer) => customer.name}
+      itemsEqual={(a, b) => a.id == b.id}
+      itemPredicate={filterCustomer}
+      noResults={<MenuItem disabled={true} text="No results." />}
+    />
+  </FormGroup>
+);

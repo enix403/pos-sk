@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 
+import { action } from 'mobx'
 import { observer } from 'mobx-react'
 
 import cn from 'classnames'
@@ -11,14 +12,15 @@ import {
   Button,
   NonIdealState,
   RadioGroup,
-  Radio
+  Radio,
+  Colors
 } from '@blueprintjs/core'
 
 import { SaleMethod } from '@shared/contracts/ISale'
 
 import { CreditCustomerSelect } from './CreditCustomerSelect'
 
-import { CartStoreContext } from './store'
+import { CartStoreContext, CartHealth } from './store'
 import { numberWithCommas } from './utility'
 import { financialInputProps } from './common'
 
@@ -74,54 +76,57 @@ const AmountPaidForm = ({ setAmountPaid, amountPaid, change }) => (
 export const FinancialsPanel = observer(() => {
   const store = React.useContext(CartStoreContext)!;
 
-  const [method, setMethod] = useState<SaleMethod>(SaleMethod.Direct);
-  const [discount, setDiscount] = useState(0);
-  const [amountPaid, setAmountPaid] = useState(0);
-  const [cust, setCust] = useState(null);
-
-  const billAmount = store.billAmount;
-  const payable = billAmount - discount;
-  const change = amountPaid - payable;
-
   return (
     <div className="bar-panel financials bp3-dark">
       <h4 className="bp3-heading header-margin-b-l">Transaction</h4>
 
       <StatRow title="Item Count" value={store.itemCount} />
-      <StatRow title="Bill Amount" value={billAmount} />
+      <StatRow title="Bill Amount" value={store.billAmount} />
 
-      <DiscountInput value={discount} setValue={setDiscount} max={billAmount} />
+      <DiscountInput
+        value={store.discount}
+        setValue={action((d) => store.discount = d)}
+        max={store.billAmount} />
 
-      <StatRow className="money-highlight" title="Total Payable" value={payable} />
+      <StatRow className="money-highlight" title="Total Payable" value={store.payable} />
 
       <RadioGroup
         inline
         label="Sale Method"
         className="sale-method-radio"
-        onChange={(event) => setMethod(event.currentTarget.value as SaleMethod)}
-        selectedValue={method}
+        onChange={action(event => store.method = (event.currentTarget.value as SaleMethod))}
+        selectedValue={store.method}
       >
         <Radio large label="Cash" value={SaleMethod.Direct} />
         <Radio large label="Credit" value={SaleMethod.Credit} />
       </RadioGroup>
 
-      {method == SaleMethod.Direct ?
+      {store.method == SaleMethod.Direct ?
         <AmountPaidForm
-          setAmountPaid={setAmountPaid}
-          amountPaid={amountPaid}
-          change={change}
+          setAmountPaid={action(p => store.amountPaid = p)}
+          amountPaid={store.amountPaid}
+          change={store.cashChange}
         /> :
         <CreditCustomerSelect
-          value={cust}
-          setValue={setCust}
+          value={store.customer}
+          setValue={action(c => store.customer = c)}
         />
       }
 
       <div className="checkout">
+        <div
+          className="bp3-text-small status"
+          style={{
+            color: store.health == CartHealth.Ok ? Colors.GREEN5 : Colors.RED5
+          }}
+        >
+          {store.healthString}
+        </div>
         <Button
           intent="primary"
           text="Checkout"
           icon="box"
+          disabled={store.health != CartHealth.Ok}
         />
       </div>
 
