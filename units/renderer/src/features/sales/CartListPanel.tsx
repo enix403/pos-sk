@@ -55,7 +55,7 @@ const CartItemView = observer(({ item }: { item: CartItem }) => (
       icon="chevron-down"
       intent="primary"
       minimal outlined
-      disabled={item.quantity == 1}
+      disabled={item.quantity <= 1}
       onClick={() => item.quantityDec()}
     />
     <div className="vdivider" />
@@ -67,7 +67,6 @@ const CartItemView = observer(({ item }: { item: CartItem }) => (
     />
   </div>
 ));
-
 
 export const CartListPanel = observer(() => {
 

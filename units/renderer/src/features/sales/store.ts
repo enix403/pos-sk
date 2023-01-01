@@ -60,6 +60,7 @@ export enum POSStage {
 // Todo: Make it a bitmask or array to handle more than one errors at a time
 export enum CartHealth {
     Ok,
+    Empty,
     InvalidQuantity,
     InvalidDiscount,
     InsufficientCash,
@@ -85,7 +86,9 @@ class CartStore {
         this.amountPaid = 0;
         this.customer = null;
 
-        makeAutoObservable(this);
+        makeAutoObservable(this, {
+            healthString: false
+        });
     }
 
     addItem(storeItem: ItemResource) {
@@ -127,6 +130,8 @@ class CartStore {
     }
 
     get health(): CartHealth {
+        if (this.items.length == 0)
+            return CartHealth.Empty;
 
         if (this.items.some(itm => itm.quantity <= 0))
             return CartHealth.InvalidQuantity;
@@ -148,6 +153,7 @@ class CartStore {
     get healthString(): string {
         switch (this.health) {
             case CartHealth.Ok: return 'OK';
+            case CartHealth.Empty: return 'No Items Added';
             case CartHealth.InvalidQuantity: return 'Some item(s) have invalid specified quantity';
             case CartHealth.InvalidDiscount: return 'Invalid Discount';
             case CartHealth.InsufficientCash: return 'Insufficient Cash';

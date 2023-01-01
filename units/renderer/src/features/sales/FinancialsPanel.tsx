@@ -20,7 +20,7 @@ import { SaleMethod } from '@shared/contracts/ISale'
 
 import { CreditCustomerSelect } from './CreditCustomerSelect'
 
-import { CartStoreContext, CartHealth } from './store'
+import { CartStoreContext, CartHealth, POSStage } from './store'
 import { numberWithCommas } from './utility'
 import { financialInputProps } from './common'
 
@@ -73,6 +73,41 @@ const AmountPaidForm = ({ setAmountPaid, amountPaid, change }) => (
   </>
 );
 
+const HealthView = observer(({ store }) => {
+  let color: string;
+  switch (store.health) {
+    case CartHealth.Ok: color = Colors.GREEN5; break;
+    case CartHealth.Empty: color = Colors.LIME5; break;
+    default: color = Colors.RED5; break;
+  }
+
+  return (
+    <div className="bp3-text-small status" style={{ color }}>
+      {store.healthString}
+    </div>
+  );
+});
+
+const CheckoutButton = observer(({ store }) => {
+
+  const disabled =
+    store.health != CartHealth.Ok ||
+    store.stage != POSStage.Idle;
+
+  return (
+    <Button
+      intent="primary"
+      text="Checkout"
+      icon="box"
+      onClick={action(() => {
+        /* TODO: Invoke proper action */
+        store.stage = POSStage.Checkout;
+      })}
+      disabled={disabled}
+    />
+  );
+});
+
 export const FinancialsPanel = observer(() => {
   const store = React.useContext(CartStoreContext)!;
 
@@ -114,20 +149,8 @@ export const FinancialsPanel = observer(() => {
       }
 
       <div className="checkout">
-        <div
-          className="bp3-text-small status"
-          style={{
-            color: store.health == CartHealth.Ok ? Colors.GREEN5 : Colors.RED5
-          }}
-        >
-          {store.healthString}
-        </div>
-        <Button
-          intent="primary"
-          text="Checkout"
-          icon="box"
-          disabled={store.health != CartHealth.Ok}
-        />
+        <HealthView store={store} />
+        <CheckoutButton store={store} />
       </div>
 
     </div>
