@@ -6,7 +6,7 @@ import { Observer } from 'mobx-react'
 
 import { Classes, Dialog, Button } from '@blueprintjs/core'
 
-import { POSStage, CartStoreContext, cartStore } from './store'
+import { POSStage, CartStoreContext, cartStore as store, MakeSale } from './store'
 
 import { CartListPanel } from './CartListPanel'
 import { AddItemPanel } from './AddItemPanel'
@@ -14,9 +14,21 @@ import { FinancialsPanel } from './FinancialsPanel'
 
 import { CheckoutConfirmDialog } from './CheckoutConfirmDialog'
 
+const onDialogCofirm = action(() => {
+  store.stage = POSStage.PostCheckout;
+  MakeSale(store).then(action(() => {
+    store.clear();
+    store.stage = POSStage.Idle;
+  }));
+});
+
+const onDialogClose = action(() => {
+  store.stage = POSStage.Idle;
+});
+
 export const NewSaleView = () => {
   return (
-    <CartStoreContext.Provider value={cartStore}>
+    <CartStoreContext.Provider value={store}>
       <div className='new-sale-view'>
         <CartListPanel />
         <AddItemPanel />
@@ -26,12 +38,10 @@ export const NewSaleView = () => {
       <Observer>
         {() => (
           <CheckoutConfirmDialog
-            isOpen={cartStore.stage == POSStage.Checkout}
-            onClose={action(() => {
-              /* TODO: Invoke proper action */
-              cartStore.stage = POSStage.Idle;
-              // cartStore.clear();
-            })}
+            store={store}
+            isOpen={store.stage == POSStage.Checkout}
+            onConfirm={onDialogCofirm}
+            onClose={onDialogClose}
           />
         )}
       </Observer>

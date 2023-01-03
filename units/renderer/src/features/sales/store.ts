@@ -8,7 +8,7 @@ import { SaleMethod } from '@shared/contracts/ISale'
 import { DUMMY_ITEMS } from './temp_items'
 import type { CustomerResource } from './CreditCustomerSelect';
 
-type ItemResource = Identified<IStoreItem>;
+export type ItemResource = Identified<IStoreItem>;
 
 export class CartItem {
     store: CartStore
@@ -67,7 +67,7 @@ export enum CartHealth {
     CustomerNotSelected
 }
 
-class CartStore {
+export class CartStore {
     stage: POSStage;
     items: Array<CartItem>;
 
@@ -160,6 +160,10 @@ class CartStore {
             case CartHealth.CustomerNotSelected: return 'Customer Not Selected';
         }
     }
+}
+
+export async function MakeSale(store: CartStore): Promise<void> {
+
 }
 
 export const cartStore = new CartStore();

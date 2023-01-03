@@ -45,14 +45,14 @@ const CartItemView = observer(({ item }: { item: CartItem }) => (
     </p>
 
     <Button
-      icon="chevron-up"
+      icon="plus"
       intent="success"
       minimal outlined
       onClick={() => item.quantityInc()}
     />
     <div className="vdivider" />
     <Button
-      icon="chevron-down"
+      icon="minus"
       intent="primary"
       minimal outlined
       disabled={item.quantity <= 1}

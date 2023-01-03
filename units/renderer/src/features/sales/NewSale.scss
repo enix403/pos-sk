@@ -6,8 +6,49 @@
     font-family: 'Fira Code';
 }
 
-.vdivider {
+/* --- Financial row --- */
+.fin-row-margin {
+    margin: 0 12px 0;
+    margin-bottom: 16px;
 }
+
+.fin-row, .discount-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+
+.fin-row {
+    padding-bottom: 8px;
+    border-bottom: 1px solid #8a8a8a;
+    .t {
+        text-transform: uppercase;
+        color: #C5CBD3;
+        font-weight: 400;
+        font-size: 17px;
+    }
+    .v {
+        font-weight: 700;
+        font-size: 18px;
+        font-family: 'Fira Code';
+    }
+}
+
+@mixin money-highlight($hColor) {
+    border-color: $hColor !important;
+    .t, .v {
+        color: $hColor !important;
+    }
+}
+
+.fin-row.money-highlight { @include money-highlight(#96ffd2); }
+.fin-row.money-highlight-light { @include money-highlight(#404854); }
+.fin-row.money-highlight-alt { @include money-highlight(#FFD97D); }
+.fin-row.money-highlight-err { @include money-highlight(#FF9B85); }
+
+/* /--- */
+
 
 .vdivider {
     border-left: 2px solid #BD6BBD;
@@ -51,47 +92,6 @@
     padding: 16px 20px 0;
 
     &.financials {
-        .fin-row-margin {
-            margin: 0 12px 0;
-            margin-bottom: 16px;
-        }
-
-        .fin-row, .discount-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-
-        .fin-row {
-            padding-bottom: 8px;
-            border-bottom: 1px solid #8a8a8a;
-            .t {
-                text-transform: uppercase;
-                color: #C5CBD3;
-                font-weight: 400;
-                font-size: 17px;
-            }
-            .v {
-                font-weight: 700;
-                font-size: 18px;
-                font-family: 'Fira Code';
-            }
-        }
-
-        @mixin money-highlight($hColor) {
-            border-color: $hColor !important;
-            .t, .v {
-                color: $hColor !important;
-            }
-        }
-
-
-        // .fin-row.money-highlight { @include money-highlight(#83F6C4); }
-        .fin-row.money-highlight { @include money-highlight(#96ffd2); }
-        .fin-row.money-highlight-alt { @include money-highlight(#FFD97D); }
-        .fin-row.money-highlight-err { @include money-highlight(#FF9B85); }
-
         .sale-method-radio {
             margin-top: 24px;
             margin-bottom: 24px;
@@ -180,16 +180,5 @@
 
     .status {
         margin-bottom: 8px;
-    }
-}
-
-/* ---------------------------------------- */
-/* -------- Checkout/Confirm Stage -------- */
-/* ---------------------------------------- */
-
-.checkout-view {
-    // temp
-    p {
-        margin-bottom: 16px;
     }
 }

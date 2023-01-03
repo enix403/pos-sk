@@ -21,15 +21,7 @@ import { SaleMethod } from '@shared/contracts/ISale'
 import { CreditCustomerSelect } from './CreditCustomerSelect'
 
 import { CartStoreContext, CartHealth, POSStage } from './store'
-import { numberWithCommas } from './utility'
-import { financialInputProps } from './common'
-
-const StatRow = ({ title, value, ...rest }) => (
-  <div {...rest} className={cn("fin-row fin-row-margin", rest.className || '')}>
-    <span className="t">{title}</span>
-    <span className="v">{numberWithCommas(value)}</span>
-  </div>
-);
+import { StatRow, financialInputProps } from './common'
 
 const DiscountInput = ({ value, setValue, max }) => (
   <div className="discount-row fin-row-margin">
