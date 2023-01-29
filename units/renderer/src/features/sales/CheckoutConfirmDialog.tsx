@@ -94,6 +94,10 @@ export const CheckoutConfirmDialog: React.FC<ICheckoutConfirmDialogProps> = ({
 
         <div className="panel-stats">
           <div className="box-row">
+            <div className="box box">
+              <p className="title">Item Count</p>
+              <p className="value">{numberWithCommas(store.itemCount)}</p>
+            </div>
             <div className="box box-1">
               <p className="title">Bill Amount</p>
               <p className="value">{numberWithCommas(store.billAmount)}</p>
@@ -103,7 +107,7 @@ export const CheckoutConfirmDialog: React.FC<ICheckoutConfirmDialogProps> = ({
               <p className="value">{numberWithCommas(store.discount)}</p>
             </div>
             <div className="box box-3">
-              <p className="title">Total Amount Payable</p>
+              <p className="title">Total Payable</p>
               <p className="value">{numberWithCommas(store.payable)}</p>
             </div>
           </div>
