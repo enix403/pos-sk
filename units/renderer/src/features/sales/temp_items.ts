@@ -10,12 +10,12 @@ export const DUMMY_ITEMS: Array<Identified<IStoreItem>> = [
 
         family: StoreItemFamily.TradeItem,
 
-        name: "Item 1",
+        name: "Wheat",
         description: "",
 
         unit: "kg",
         cost_price: 343,
-        retail_price: 373,
+        retail_price: 400,
 
         active: true,
 
@@ -31,10 +31,10 @@ export const DUMMY_ITEMS: Array<Identified<IStoreItem>> = [
 
         family: StoreItemFamily.TradeItem,
 
-        name: "Item 2",
+        name: "Rio Chocolate",
         description: "",
 
-        unit: "kg",
+        unit: "pc",
         cost_price: 347,
         retail_price: 377,
 
@@ -52,10 +52,10 @@ export const DUMMY_ITEMS: Array<Identified<IStoreItem>> = [
 
         family: StoreItemFamily.TradeItem,
 
-        name: "Item 3",
+        name: "Rio Strawberry",
         description: "",
 
-        unit: "kg",
+        unit: "pc",
         cost_price: 351,
         retail_price: 381,
 
@@ -73,7 +73,7 @@ export const DUMMY_ITEMS: Array<Identified<IStoreItem>> = [
 
         family: StoreItemFamily.TradeItem,
 
-        name: "Item 4",
+        name: "Rice",
         description: "",
 
         unit: "kg",

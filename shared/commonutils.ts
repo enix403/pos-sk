@@ -6,3 +6,7 @@ export function discardArrFalsey<T = any>(arr: (T | EnhancedBool)[]) : T[]
 }
 
 export const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
+
+export function getActiveCurrency(): string {
+    return 'Rs';
+}

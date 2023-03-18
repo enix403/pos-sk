@@ -2,7 +2,7 @@ import { createContext } from 'react'
 import { makeAutoObservable, makeObservable, observable } from 'mobx'
 
 import type { Identified } from '@shared/tsutils'
-import type { IStoreItem } from '@shared/contracts/IStoreItem'
+import { IStoreItem, UnitDescription, fromSlug, applySubUnit } from '@shared/contracts/IStoreItem'
 import { SaleMethod } from '@shared/contracts/ISale'
 
 import { DUMMY_ITEMS } from './temp_items'
@@ -14,6 +14,7 @@ export class CartItem {
     store: CartStore
     itemResource: ItemResource;
     quantity: number;
+    subQuantity: number;
     price: number;
 
     constructor(store: CartStore, item: ItemResource) {
@@ -21,6 +22,7 @@ export class CartItem {
         this.itemResource = item;
         this.price = item.retail_price;
         this.quantity = 1;
+        this.subQuantity = 0;
 
         makeAutoObservable(this, {
             store: false,
@@ -28,9 +30,35 @@ export class CartItem {
         });
     }
 
+    get unitDesc(): UnitDescription {
+        const unit = fromSlug(this.itemResource.unit);
+        if (unit == null)
+            throw new Error(`Unit "${this.itemResource.unit}" not found`);
+
+        return unit;
+    }
+
     setQuantity(qty: number) {
         if (!isNaN(qty))
             this.quantity = Math.floor(qty);
+    }
+
+    setSubQuantity(qty: number) {
+        if (!isNaN(qty))
+            this.subQuantity = Math.floor(qty);
+    }
+
+    get realQuantity(): number {
+        const unit = this.unitDesc;
+
+        if (unit.subUnit == null)
+            return this.quantity;
+
+        return this.quantity + applySubUnit(unit, this.subQuantity);
+    }
+
+    get subtotal(): number {
+        return this.realQuantity * this.price;
     }
 
     quantityInc() {
@@ -66,6 +94,16 @@ export enum CartHealth {
     InsufficientCash,
     CustomerNotSelected
 }
+
+const _gHealthStringMap = {
+    [CartHealth.Ok]: "OK",
+    [CartHealth.Empty]: "No Items Added",
+    [CartHealth.InvalidQuantity]: "Some item(s) have invalid specified quantity",
+    [CartHealth.InvalidDiscount]: "Invalid Discount",
+    [CartHealth.InsufficientCash]: "Insufficient Cash",
+    [CartHealth.CustomerNotSelected]: "Customer Not Selected",
+};
+
 
 export class CartStore {
     stage: POSStage;
@@ -114,11 +152,19 @@ export class CartStore {
     }
 
     get itemCount(): number {
-        return this.items.reduce((acc, item) => acc + item.quantity, 0);
+        return this.items.reduce((acc, item) => {
+            // Count non-piece units as single item regardless of specified quantiy
+            // BUT if their quantity is 0 then it is an error and must be reported.
+            let q = item.realQuantity;
+            if (q != 0 && item.unitDesc.subUnit != null)
+                q = 1;
+
+            return acc + q;
+        }, 0);
     }
 
     get billAmount(): number {
-        return this.items.reduce((acc, item) => acc + item.quantity * item.price, 0);
+        return this.items.reduce((acc, item) => acc + item.subtotal, 0);
     }
 
     get payable(): number {
@@ -133,7 +179,7 @@ export class CartStore {
         if (this.items.length == 0)
             return CartHealth.Empty;
 
-        if (this.items.some(itm => itm.quantity <= 0))
+        if (this.items.some(itm => itm.realQuantity <= 0))
             return CartHealth.InvalidQuantity;
 
         if (this.discount < 0 || this.discount > this.billAmount)
@@ -151,14 +197,7 @@ export class CartStore {
     }
 
     get healthString(): string {
-        switch (this.health) {
-            case CartHealth.Ok: return 'OK';
-            case CartHealth.Empty: return 'No Items Added';
-            case CartHealth.InvalidQuantity: return 'Some item(s) have invalid specified quantity';
-            case CartHealth.InvalidDiscount: return 'Invalid Discount';
-            case CartHealth.InsufficientCash: return 'Insufficient Cash';
-            case CartHealth.CustomerNotSelected: return 'Customer Not Selected';
-        }
+        return _gHealthStringMap[this.health];
     }
 }
 
@@ -174,6 +213,7 @@ window.di = DUMMY_ITEMS;
 
 
 cartStore.addItem(DUMMY_ITEMS[0]);
+
 cartStore.addItem(DUMMY_ITEMS[0]);
 cartStore.addItem(DUMMY_ITEMS[1]);
 cartStore.addItem(DUMMY_ITEMS[2]);
@@ -181,6 +221,7 @@ cartStore.addItem(DUMMY_ITEMS[2]);
 cartStore.addItem(DUMMY_ITEMS[1]);
 cartStore.addItem(DUMMY_ITEMS[3]);
 cartStore.addItem(DUMMY_ITEMS[0]);
+
 
 
 export const CartStoreContext = createContext<CartStore | undefined>(undefined);

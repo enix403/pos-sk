@@ -18,7 +18,6 @@
     justify-content: space-between;
 }
 
-
 .fin-row {
     padding-bottom: 8px;
     border-bottom: 1px solid #8a8a8a;
@@ -48,7 +47,6 @@
 .fin-row.money-highlight-err { @include money-highlight(#FF9B85); }
 
 /* /--- */
-
 
 .vdivider {
     border-left: 2px solid #BD6BBD;
@@ -105,51 +103,66 @@
 .new-sale-view .cart-panel {
     background-color: #F8F9FA;
     flex: 1;
-
-    padding: 16px 16px;
-
+    padding: 0px;
     overflow-y: auto;
-
-    .cart-item-list {
-
-        display: flex;
-        flex-direction: column;
-        align-items: stretch;
-
-        .cart-item {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-
-            padding: 6px 6px;
-
-            border-bottom: 2px solid #e6e6e6;
-        }
-    }
 }
 
-.cart-item-list .cart-item {
+table.cart-item-list {
     .itm-name {
-        font-size: 1.1rem;
-        font-weight: 500;
+        font-size: 1.02rem;
+        font-weight: 700;
+        color: #B83211;
+        color: #866103;
+        font-family: 'Hack';
         text-transform: uppercase;
-        margin-right: 10px;
+        // margin-right: 10px;
+    }
+
+    td.fitwidth {
+        width: 1px;
+        white-space: nowrap;
     }
 
     .itm-attrs {
-        flex: 1;
-        padding-left: 10px;
-        border-left: 1px solid #1a2c35;
+        margin-left: 10px;
         font-style: italic;
     }
 
     .quantity {
-        // margin-left: 16px;
-        margin-right: 16px;
+        width: 140px * 2;
     }
-    .quantity .bp3-input-group {
-        width: 170px;
+}
+
+table.cart-item-list {
+    border-collapse: collapse;
+
+    td, th {
+        padding-left: 8px;
+        padding-right: 8px;
     }
+
+    td, th, tr {
+        border-width: 1px;
+        border-color: #404854;
+        border-style: solid;
+    }
+
+    th {
+        // background-color: #E8F9B6;
+        // background-color: #72CA9B;
+        // background-color: #8ABBFF;
+        // background-color: #FA999C;
+        // background-color: #BDADFF;
+        // background-color: #FF9980;
+        background-color: #D4F17E;
+        color: #1C2127;
+
+        font-family: 'Fira Code';
+        font-size: 16px;
+        text-align: left;
+        padding: 14px 10px;
+    }
+
 }
 
 /* ------------------------------ */
@@ -182,3 +195,6 @@
         margin-bottom: 8px;
     }
 }
+
+
+/* ------------------------------ */
