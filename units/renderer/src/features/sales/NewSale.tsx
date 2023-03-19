@@ -4,9 +4,20 @@ import './NewSale.scss'
 import { action } from 'mobx'
 import { Observer } from 'mobx-react'
 
-import { Classes, Dialog, Button } from '@blueprintjs/core'
+import {
+  Classes,
+  Dialog,
+  Button,
+  Overlay,
+  Spinner,
+} from '@blueprintjs/core'
 
-import { POSStage, CartStoreContext, cartStore as store, MakeSale } from './store'
+import {
+  POSStage,
+  CartStoreContext,
+  rootStore,
+  MakeSale
+} from './store'
 
 import { CartListPanel } from './CartListPanel'
 import { AddItemPanel } from './AddItemPanel'
@@ -14,21 +25,26 @@ import { FinancialsPanel } from './FinancialsPanel'
 
 import { CheckoutConfirmDialog } from './CheckoutConfirmDialog'
 
+const { cartStore, invStore } = rootStore;
+
 const onDialogCofirm = action(() => {
-  store.stage = POSStage.PostCheckout;
-  MakeSale(store).then(action(() => {
-    store.clear();
-    store.stage = POSStage.Idle;
+  cartStore.stage = POSStage.PostCheckout;
+  MakeSale(cartStore).then(action(() => {
+    cartStore.clear();
+    cartStore.stage = POSStage.Idle;
   }));
 });
 
 const onDialogClose = action(() => {
-  store.stage = POSStage.Idle;
+  cartStore.stage = POSStage.Idle;
 });
 
 export const NewSaleView = () => {
+  React.useEffect(() => {
+    invStore.fetchAvailableItems();
+  }, []);
   return (
-    <CartStoreContext.Provider value={store}>
+    <CartStoreContext.Provider value={rootStore}>
       <div className='new-sale-view'>
         <CartListPanel />
         <AddItemPanel />
@@ -38,8 +54,8 @@ export const NewSaleView = () => {
       <Observer>
         {() => (
           <CheckoutConfirmDialog
-            store={store}
-            isOpen={store.stage == POSStage.Checkout}
+            store={cartStore}
+            isOpen={cartStore.stage == POSStage.Checkout}
             onConfirm={onDialogCofirm}
             onClose={onDialogClose}
           />
@@ -48,5 +64,5 @@ export const NewSaleView = () => {
 
     </CartStoreContext.Provider>
   );
-}
+};
 

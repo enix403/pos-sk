@@ -109,18 +109,28 @@
 
 table.cart-item-list {
     .itm-name {
-        font-size: 1.02rem;
+        font-size: 1.05rem;
         font-weight: 700;
         color: #B83211;
         color: #866103;
-        font-family: 'Hack';
+        font-family: 'Fira Code';
         text-transform: uppercase;
-        // margin-right: 10px;
     }
 
-    td.fitwidth {
-        width: 1px;
-        white-space: nowrap;
+    td, th {
+        &.fitwidth {
+            width: 1px;
+            white-space: nowrap;
+        }
+        &.alcenter {
+            text-align: center;
+        }
+    }
+
+    .itm-price * {
+        font-family: 'Fira Code';
+        font-size: 1rem;
+        font-weight: 400;
     }
 
     .itm-attrs {

@@ -101,7 +101,7 @@ const CheckoutButton = observer(({ store }) => {
 });
 
 export const FinancialsPanel = observer(() => {
-  const store = React.useContext(CartStoreContext)!;
+  const { cartStore: store } = React.useContext(CartStoreContext)!;
 
   return (
     <div className="bar-panel financials bp3-dark">

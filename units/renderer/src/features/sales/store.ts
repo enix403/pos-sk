@@ -8,6 +8,11 @@ import { SaleMethod } from '@shared/contracts/ISale'
 import { DUMMY_ITEMS } from './temp_items'
 import type { CustomerResource } from './CreditCustomerSelect';
 
+import { MSG } from '@shared/communication';
+import { MessageTracker } from '@/features/MessageTracker';
+import { simpleErrorAlert, isResponseSuccessful, formatResponseErrorLog } from '@/utils';
+
+
 export type ItemResource = Identified<IStoreItem>;
 
 export class CartItem {
@@ -103,7 +108,6 @@ const _gHealthStringMap = {
     [CartHealth.InsufficientCash]: "Insufficient Cash",
     [CartHealth.CustomerNotSelected]: "Customer Not Selected",
 };
-
 
 export class CartStore {
     stage: POSStage;
@@ -201,16 +205,54 @@ export class CartStore {
     }
 }
 
+class InventoryStore {
+    loading: boolean;
+    allItems: ItemResource[];
+
+    constructor() {
+        this.allItems = [];
+        this.loading = true;
+        makeAutoObservable(this, {
+            allItems: observable.shallow
+        });
+    }
+
+    fetchAvailableItems() {
+        this.loading = true;
+        let _this = this;
+
+        window.SystemBackend.sendMessage(new MSG.Stock.GetStocks()).then(res => {
+            _this.loading = false;
+
+            if (!isResponseSuccessful(res)) {
+                console.error("InventoryStore::fetchAvailableItems(): Failed to complete message:", formatResponseErrorLog(res));
+                simpleErrorAlert("Could not fetch available items");
+                return;
+            }
+
+            _this.allItems = res.data!;
+        });
+    }
+};
+
 export async function MakeSale(store: CartStore): Promise<void> {
 
 }
 
 export const cartStore = new CartStore();
+export const invStore = new InventoryStore();
+
+export const rootStore = {
+    cartStore,
+    invStore
+};
+
 // @ts-ignore
-window.store = cartStore;
+window.cartStore = cartStore;
+// @ts-ignore
+window.invStore = invStore;
 // @ts-ignore
 window.di = DUMMY_ITEMS;
-
 
 cartStore.addItem(DUMMY_ITEMS[0]);
 
@@ -223,5 +265,4 @@ cartStore.addItem(DUMMY_ITEMS[3]);
 cartStore.addItem(DUMMY_ITEMS[0]);
 
 
-
-export const CartStoreContext = createContext<CartStore | undefined>(undefined);
+export const CartStoreContext = createContext<typeof rootStore | undefined>(undefined);

@@ -13,7 +13,7 @@ import {
 import { sleep } from '@shared/commonutils'
 import { logger } from '@/logging'
 
-import { Sale, SaleItem, Customer } from '@/entities'
+import { Sale, SaleItem, Customer, ItemStock } from '@/entities'
 
 export class SaleChannel extends IpcChannel {
     constructor() {
@@ -23,6 +23,8 @@ export class SaleChannel extends IpcChannel {
     }
 
     private newSale = new MsgDispatch(MSG.Sale.CreateSale, async (payload) => {
+        // **TODO**: Check if there are enough units of each item to proceed with the sale
+
         const { cart, meta } = payload;
 
         if (cart.length == 0)
@@ -51,7 +53,7 @@ export class SaleChannel extends IpcChannel {
         }
 
         // Preload the required items
-        const cartItemIds = cart.map(cartItem => cartItem.item.id);
+        const cartItemIds: number[] = cart.map(cartItem => cartItem.item.id);
         const storeItems = await em.find(StoreItem, cartItemIds);
 
         let totalAmount = 0;

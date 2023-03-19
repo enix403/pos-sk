@@ -89,8 +89,8 @@ const CartItemView = observer(({ item }: { item: CartItem }) => (
     <td className="quantity">
       {RenderQuantityInput(item)}
     </td>
-    <td className="fitwidth">
-      <Tag intent="success">{getActiveCurrency()}. {item.price}</Tag>
+    <td className="itm-price fitwidth alcenter">
+      <strong>{item.price}</strong>
     </td>
     <td>
       <span className="itm-name">{item.itemResource.name}</span>
@@ -127,7 +127,7 @@ const CartItemView = observer(({ item }: { item: CartItem }) => (
 
 export const CartListPanel = observer(() => {
 
-  const store = React.useContext(CartStoreContext)!;
+  const { cartStore: store } = React.useContext(CartStoreContext)!;
 
   return (
     <div className="cart-panel">
@@ -140,9 +140,9 @@ export const CartListPanel = observer(() => {
           <thead>
             <tr>
               <th>Qty</th>
-              <th>Price</th>
+              <th className="fitwidth alcenter">Price<br /><small>({getActiveCurrency()})</small> </th>
               <th>Item</th>
-              <th>Actions</th>
+              <th className="alcenter">Actions</th>
             </tr>
           </thead>
           <tbody>

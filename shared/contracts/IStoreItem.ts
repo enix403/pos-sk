@@ -20,7 +20,7 @@ export function fromSlug(s: string): UnitDescription | null {
 }
 
 export function applySubUnit(_unit: UnitDescription, su: number): number {
-    // A very terrible hack.
+    // *A very terrible hack*.
     // Currently all sub units are a 1000th (thousandth) part of their (parent) unit
     // So *urrently* just divide by 1000 to get the quantity in actual unit
     //
