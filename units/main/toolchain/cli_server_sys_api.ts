@@ -1,5 +1,6 @@
 import http from 'http';
 import { CommResultType, Message } from '@shared/communication';
+import type { ChannelResponse } from '@shared/communication';
 
 const HOSTNAME = 'localhost';
 const PORT = process.env.DEV_MOCK_SERVER_PORT;
@@ -44,6 +45,6 @@ export async function sendPlainMessage(message: any) {
 }
 
 
-export function sendMessage(msg: Message<any, any>) {
+export function sendMessage<T>(msg: Message<any, T>): Promise<ChannelResponse<T>> {
     return sendPlainMessage(Message.serialize(msg));
 }

@@ -1,6 +1,12 @@
 import path from 'path';
 import { defineConfig } from "vite";
+
 import react from "@vitejs/plugin-react";
+
+import wasm from "vite-plugin-wasm";
+import topLevelAwait from "vite-plugin-top-level-await";
+
+
 import tsconfigPaths from 'vite-tsconfig-paths';
 
 import { resolveProjectRoot, RP_BUILD_COMPILED_RENDERER } from '@shared/app_paths';
@@ -15,7 +21,10 @@ export default defineConfig(({ mode }) => {
 
         plugins: [
             tsconfigPaths({ loose: true }),
-            react()
+            react(),
+            // For wasm
+            wasm(),
+            topLevelAwait()
         ],
 
         build: {
@@ -45,6 +54,9 @@ export default defineConfig(({ mode }) => {
 
         optimizeDeps: {
             keepNames: false,
+            exclude: [
+                "@syntect/wasm"
+            ]
         },
 
         json: {

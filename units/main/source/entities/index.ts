@@ -51,7 +51,7 @@ export type EntityClass<T extends SimpleEntity> = {
 
 // It's kinda ugly to have `['somerelation'] as ModelRelation<SomeEntity>[]` floating everywhere.
 export function entt_relation_list<T extends SimpleEntity>(
-  ...rels: (ModelRelation<T> | EnhancedBool)[]
+  ...rels: (string | ModelRelation<T> | EnhancedBool)[]
 ): ModelRelation<T>[] {
   return rels.filter(Boolean) as ModelRelation<T>[];
 }

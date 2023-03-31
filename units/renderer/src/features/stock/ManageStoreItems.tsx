@@ -48,6 +48,7 @@ interface IAttributesRowProps {
   onStatusChange: (id: any) => void;
   onRemove: (id: any) => void;
 };
+
 function AttributesRow(props: IAttributesRowProps) {
   const { editing } = props;
   const inputIntent = editing ? Intent.SUCCESS : Intent.NONE;
@@ -107,11 +108,16 @@ class AttributesList extends React.Component<{}, AttributesList.State> {
     super(props);
   }
 
-  componentDidMount() {
+
+  public reset() {
+    this.nextId = 1;
     this.updateAttr(
-      { id: this.nextId++, name: "Color", value: "" },
       { id: this.nextId++, name: "Size", value: "" }
     );
+  }
+
+  componentDidMount() {
+    this.reset();
   }
 
   private addAttribute = () => {
@@ -263,7 +269,8 @@ class StoreItemForm extends React.Component<StoreItemForm.Props, StoreItemForm.S
 
   private onFormSubmit: StoreItemForm.OnSubmitType = async (values, form) => {
     const list = this.attributeListsRef.current!;
-    const attributes = list.toArray();
+    // const attributes = list.toArray().filter(obj => obj.value.trim() != "");
+    const attributes = list.toArray().filter(obj => obj.value.trim() != "");
 
     let pcode_enabled = this.state.pcode_enabled;
 
@@ -283,6 +290,7 @@ class StoreItemForm extends React.Component<StoreItemForm.Props, StoreItemForm.S
 
     blurAllInputs();
     form.restart();
+    this.attributeListsRef.current!.reset();
   };
 
   render() {

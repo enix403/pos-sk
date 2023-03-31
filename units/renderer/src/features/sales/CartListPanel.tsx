@@ -84,6 +84,15 @@ function RenderQuantityInput(item: CartItem) {
   }
 }
 
+function attributesString(alist: IStoreItemAttribute[]) {
+  if (alist.length == 0)
+    return <></>;
+
+  return (
+    <>({alist.map(buildAttrFragment)})</>
+  );
+}
+
 const CartItemView = observer(({ item }: { item: CartItem }) => (
   <tr>
     <td className="quantity">
@@ -93,10 +102,10 @@ const CartItemView = observer(({ item }: { item: CartItem }) => (
       <strong>{item.price}</strong>
     </td>
     <td>
-      <span className="itm-name">{item.itemResource.name}</span>
-      <span className="itm-attrs">(
-        {(item.itemResource.attributes as [IStoreItemAttribute]).map(buildAttrFragment)}
-      )</span>
+      <span className="itm-name">{item.rawItem.name}</span>
+      <span className="itm-attrs">
+        {attributesString(item.rawItem.attributes as [IStoreItemAttribute])}
+      </span>
     </td>
     <td className="padding-v-s fitwidth itm-buttons">
       <Button
@@ -146,7 +155,7 @@ export const CartListPanel = observer(() => {
             </tr>
           </thead>
           <tbody>
-            {store.items.map(item => <CartItemView item={item} key={item.itemResource.id} />)}
+            {store.items.map(item => <CartItemView item={item} key={item.rawItem.id} />)}
           </tbody>
         </table>
       }

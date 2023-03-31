@@ -4,6 +4,7 @@ import { makeAutoObservable, makeObservable, observable } from 'mobx'
 import type { Identified } from '@shared/tsutils'
 import { IStoreItem, UnitDescription, fromSlug, applySubUnit } from '@shared/contracts/IStoreItem'
 import { SaleMethod } from '@shared/contracts/ISale'
+import { IItemStock } from '@shared/contracts/IItemStock'
 
 import { DUMMY_ITEMS } from './temp_items'
 import type { CustomerResource } from './CreditCustomerSelect';
@@ -13,7 +14,7 @@ import { MessageTracker } from '@/features/MessageTracker';
 import { simpleErrorAlert, isResponseSuccessful, formatResponseErrorLog } from '@/utils';
 
 
-export type ItemResource = Identified<IStoreItem>;
+export type ItemResource = Identified<IItemStock>;
 
 export class CartItem {
     store: CartStore
@@ -25,20 +26,25 @@ export class CartItem {
     constructor(store: CartStore, item: ItemResource) {
         this.store = store;
         this.itemResource = item;
-        this.price = item.retail_price;
+        this.price = item.item.retail_price;
         this.quantity = 1;
         this.subQuantity = 0;
 
         makeAutoObservable(this, {
             store: false,
-            itemResource: false
+            itemResource: false,
+            rawItem: false,
         });
     }
 
+    get rawItem() {
+        return this.itemResource.item;
+    }
+
     get unitDesc(): UnitDescription {
-        const unit = fromSlug(this.itemResource.unit);
+        const unit = fromSlug(this.rawItem.unit);
         if (unit == null)
-            throw new Error(`Unit "${this.itemResource.unit}" not found`);
+            throw new Error(`Unit "${this.rawItem.unit}" not found`);
 
         return unit;
     }
@@ -134,7 +140,7 @@ export class CartStore {
     }
 
     addItem(storeItem: ItemResource) {
-        let old = this.items.find(t => t.itemResource.id == storeItem.id);
+        let old = this.items.find(t => t.rawItem.id == storeItem.item.id);
         if (!old)
             this.items.push(new CartItem(this, storeItem));
         else
@@ -142,7 +148,7 @@ export class CartStore {
     }
 
     removeItem(item: CartItem) {
-        let index = this.items.findIndex(t => t.itemResource.id == item.itemResource.id);
+        let index = this.items.findIndex(t => t.rawItem.id == item.rawItem.id);
         if (index != -1)
             this.items.splice(index, 1);
     }
@@ -221,7 +227,7 @@ class InventoryStore {
         this.loading = true;
         let _this = this;
 
-        window.SystemBackend.sendMessage(new MSG.Stock.GetStocks()).then(res => {
+        return window.SystemBackend.sendMessage(new MSG.Stock.GetStocks()).then(res => {
             _this.loading = false;
 
             if (!isResponseSuccessful(res)) {
@@ -236,7 +242,7 @@ class InventoryStore {
 };
 
 export async function MakeSale(store: CartStore): Promise<void> {
-
+    console.log("Making sale");
 }
 
 export const cartStore = new CartStore();
@@ -253,16 +259,5 @@ window.cartStore = cartStore;
 window.invStore = invStore;
 // @ts-ignore
 window.di = DUMMY_ITEMS;
-
-cartStore.addItem(DUMMY_ITEMS[0]);
-
-cartStore.addItem(DUMMY_ITEMS[0]);
-cartStore.addItem(DUMMY_ITEMS[1]);
-cartStore.addItem(DUMMY_ITEMS[2]);
-cartStore.addItem(DUMMY_ITEMS[2]);
-cartStore.addItem(DUMMY_ITEMS[1]);
-cartStore.addItem(DUMMY_ITEMS[3]);
-cartStore.addItem(DUMMY_ITEMS[0]);
-
 
 export const CartStoreContext = createContext<typeof rootStore | undefined>(undefined);

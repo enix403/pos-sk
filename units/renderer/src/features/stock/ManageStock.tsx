@@ -37,6 +37,7 @@ type IManageStockViewState = {
 export class ManageStockView extends React.Component<{}, IManageStockViewState>
 {
   private itemTracker = new MessageTracker(new MSG.Stock.GetStoreItems());
+  
   private onItemsLoad: MessageTracker.HandlerAlias<typeof this.itemTracker> = (res, msgState) => {
     this.setState({
       itemsMessageState: msgState,

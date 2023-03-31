@@ -35,7 +35,7 @@ export class StockChannel extends IpcChannel {
 
     private serializeStock = (itemStock: ItemStock): IItemStock => ({
         ...itemStock,
-        item: this.serializeItem(itemStock.item.getEntity(), false),
+        item: this.serializeItem(itemStock.item.getEntity(), true),
         updated_at: SerializedDatetime.serialize(itemStock.updated_at),
     });
 
@@ -102,7 +102,7 @@ export class StockChannel extends IpcChannel {
 
     private listStocks = new MsgDispatch(MSG.Stock.GetStocks, async () => {
         const itemStocks = await EFORK().find(ItemStock,
-            {}, { populate: entt_relation_list<ItemStock>('item') });
+            {}, { populate: entt_relation_list<ItemStock>('item', 'item.attributes') });
         return itemStocks.map(this.serializeStock);
     });
 }

@@ -1,38 +1,27 @@
-import React from 'react'
-import './NewSale.scss'
+import React from "react";
+import "./NewSale.scss";
 
-import { action } from 'mobx'
-import { Observer } from 'mobx-react'
+import { action } from "mobx";
+import { Observer } from "mobx-react";
 
-import {
-  Classes,
-  Dialog,
-  Button,
-  Overlay,
-  Spinner,
-} from '@blueprintjs/core'
+import { POSStage, CartStoreContext, rootStore, MakeSale } from "./store";
 
-import {
-  POSStage,
-  CartStoreContext,
-  rootStore,
-  MakeSale
-} from './store'
+import { CartListPanel } from "./CartListPanel";
+import { AddItemPanel } from "./AddItemPanel";
+import { FinancialsPanel } from "./FinancialsPanel";
 
-import { CartListPanel } from './CartListPanel'
-import { AddItemPanel } from './AddItemPanel'
-import { FinancialsPanel } from './FinancialsPanel'
-
-import { CheckoutConfirmDialog } from './CheckoutConfirmDialog'
+import { CheckoutConfirmDialog } from "./CheckoutConfirmDialog";
 
 const { cartStore, invStore } = rootStore;
 
 const onDialogCofirm = action(() => {
   cartStore.stage = POSStage.PostCheckout;
-  MakeSale(cartStore).then(action(() => {
-    cartStore.clear();
-    cartStore.stage = POSStage.Idle;
-  }));
+  MakeSale(cartStore).then(
+    action(() => {
+      cartStore.clear();
+      cartStore.stage = POSStage.Idle;
+    })
+  );
 });
 
 const onDialogClose = action(() => {
@@ -41,11 +30,19 @@ const onDialogClose = action(() => {
 
 export const NewSaleView = () => {
   React.useEffect(() => {
-    invStore.fetchAvailableItems();
+    invStore.fetchAvailableItems().then(() => {
+      /*
+      cartStore.addItem(invStore.allItems[0]);
+      cartStore.addItem(invStore.allItems[1]);
+      cartStore.addItem(invStore.allItems[2]);
+      cartStore.addItem(invStore.allItems[2]);
+      cartStore.addItem(invStore.allItems[3]);
+      */
+    });
   }, []);
   return (
     <CartStoreContext.Provider value={rootStore}>
-      <div className='new-sale-view'>
+      <div className="new-sale-view">
         <CartListPanel />
         <AddItemPanel />
         <FinancialsPanel />
@@ -61,8 +58,6 @@ export const NewSaleView = () => {
           />
         )}
       </Observer>
-
     </CartStoreContext.Provider>
   );
 };
-

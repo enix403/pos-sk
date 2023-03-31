@@ -1,4 +1,6 @@
-import React from 'react'
+import React from "react";
+
+import { makeAutoObservable, observable } from "mobx";
 
 import {
   Tag,
@@ -9,13 +11,12 @@ import {
   Spinner,
   Tabs,
   Tab,
-} from '@blueprintjs/core'
+} from "@blueprintjs/core";
 
 class AddByNamePanel extends React.Component {
   render() {
-
     const loading = false;
-    const visual = loading ? <Spinner intent="success" size={90} /> : 'search';
+    const visual = loading ? <Spinner intent="success" size={90} /> : "search";
 
     return (
       <>
@@ -25,8 +26,8 @@ class AddByNamePanel extends React.Component {
             large
             placeholder="Enter item name ..."
             fill
-            leftIcon='layers'
-            intent='none'
+            leftIcon="layers"
+            intent="none"
           />
           <Button
             large
@@ -50,35 +51,36 @@ class AddByNamePanel extends React.Component {
 const ScanStatusButton = ({ scanActive }) => {
   return (
     <>
-    {scanActive ?
-      <Tag
-        fill
-        icon="small-tick"
-        minimal
-        intent="success"
-      >
-        <div className="scan-tag">
-          <strong>Scanning</strong>
-        </div>
-      </Tag> :
-      <Button
-        fill
-        // large
-        intent="danger"
-        text="Click to scan"
-      />
-     }
+      {scanActive ? (
+        <Tag fill icon="small-tick" minimal intent="success">
+          <div className="scan-tag">
+            <strong>Scanning</strong>
+          </div>
+        </Tag>
+      ) : (
+        <Button
+          fill
+          // large
+          intent="danger"
+          text="Click to scan"
+        />
+      )}
     </>
   );
-}
+};
 
 export const AddItemPanel = () => {
   return (
     <div className="bar-panel">
-      <div className='add-item bp3-dark'>
+      <div className="add-item bp3-dark">
         <h4 className="bp3-heading header-margin-b-s">Add Item</h4>
         <Tabs large id="TabsExample" defaultSelectedTabId="name">
-          <Tab id="name" title="Name" panel={<AddByNamePanel />} panelClassName="addby-name" />
+          <Tab
+            id="name"
+            title="Name"
+            panel={<AddByNamePanel />}
+            panelClassName="addby-name"
+          />
           <Tab disabled id="appcode" title="Code" />
           <Tab disabled id="upc" title="UPC" />
         </Tabs>

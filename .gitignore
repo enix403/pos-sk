@@ -8,6 +8,9 @@
 !.yarn/sdks
 !.yarn/versions
 
+.vscode/
+yarn-error.log
+
 *.sublime-project
 *.sublime-workspace
 build/
