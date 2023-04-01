@@ -51,6 +51,9 @@ export namespace MSG {
 
         export class GetStocks extends SimpleMessage<void, Array<Identified<IItemStock>>>
         { static ACTION_NAME = 'stk:list'; }
+
+        export class SearchItem extends SimpleMessage<string, Array<Identified<IItemStock>>>
+        { static ACTION_NAME = 'stk:find_by_name'; }
     }
 
     /* ============================================ */

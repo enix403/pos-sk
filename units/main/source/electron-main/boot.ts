@@ -14,6 +14,8 @@ import { ELECTRON_COMM_CHANNEL_NAME } from './info';
 export const initApp = async () => {
     await createDBConnection();
 
+    await resolverBridge.onStart();
+
     // setup ipc communication channel
     ipcMain.handle(ELECTRON_COMM_CHANNEL_NAME, (_event, arg) => resolverBridge.execute(arg));
 

@@ -4,13 +4,13 @@ import {
     Collection
 } from "@mikro-orm/core"
 
-import { StoreItemFamily } from '@shared/contracts/IStoreItem'
+import { IStoreItem, StoreItemFamily } from '@shared/contracts/IStoreItem'
 
 import { CreateEnttRef, CreateInverseManyEnttRef } from './utils'
 
 import { SimpleEntity } from './SimpleEntity'
 
-export class StoreItem extends SimpleEntity {
+export class StoreItem extends SimpleEntity implements IStoreItem {
     public pcode: string | null;
     public pcode_std: string;
     public name: string;

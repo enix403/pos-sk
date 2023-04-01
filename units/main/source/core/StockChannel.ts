@@ -1,4 +1,7 @@
 import { Reference } from '@mikro-orm/core';
+// import fuzzysort from 'fuzzysort';
+
+import { Identified } from '@shared/tsutils';
 
 import { IpcChannel, MsgDispatch } from "@/channel";
 import { ChannelError } from "@/channel/exceptions";
@@ -6,6 +9,10 @@ import { ChannelError } from "@/channel/exceptions";
 import { MSG } from "@shared/communication";
 import { SerializedDatetime } from "@shared/contracts/SerializedDatetime";
 import { IItemStock } from "@shared/contracts/IItemStock";
+import { IStoreItem } from "@shared/contracts/IStoreItem";
+
+
+import { logger } from '@/logging';
 
 import { EFORK } from "@/database";
 import {
@@ -16,9 +23,10 @@ import {
     StockUpdate
 } from '@/entities';
 
-import { sleep } from '@shared/commonutils'
-
 export class StockChannel extends IpcChannel {
+
+    private itemsIndex?: Identified<IStoreItem>[];
+
     constructor() {
         super();
 
@@ -26,6 +34,17 @@ export class StockChannel extends IpcChannel {
         this.register(this.createStoreItem);
         this.register(this.updateStock);
         this.register(this.listStocks);
+
+        this.register(this.searchItemByName);
+    }
+
+    public override async onStart(): Promise<void> {
+        logger.info("onStart() called from StockChannel");
+        const em = EFORK();
+
+        this.itemsIndex = await em.find(StoreItem,
+            {}, { populate: entt_relation_list<StoreItem>('attributes') });
+
     }
 
     private serializeItem = (item: StoreItem, includeAttributes = false) => ({
@@ -104,5 +123,9 @@ export class StockChannel extends IpcChannel {
         const itemStocks = await EFORK().find(ItemStock,
             {}, { populate: entt_relation_list<ItemStock>('item', 'item.attributes') });
         return itemStocks.map(this.serializeStock);
+    });
+
+    private searchItemByName = new MsgDispatch(MSG.Stock.SearchItem, async (name: string) => {
+        return [];
     });
 }

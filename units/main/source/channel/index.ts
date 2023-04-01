@@ -28,6 +28,8 @@ export class IpcChannel {
 
     public getHandlers = () => this.handlers;
 
+    public async onStart(): Promise<void> {}
+
     protected register<T, K>(
         dispatch: MsgDispatch<T, K>
     ): void {
@@ -38,10 +40,18 @@ export class IpcChannel {
 
 export class RequestBridge {
     private handlers: HMap = {};
+    private channels: IpcChannel[];
 
     public listenOnChannels(channels: IpcChannel[]) {
+        this.channels = channels;
         this.handlers = Object.assign({}, ...channels.map(c => c.getHandlers()))
         return this;
+    }
+
+    public async onStart() {
+        for (let i = 0; i < this.channels.length; ++i) {
+            await this.channels[i].onStart();
+        }
     }
 
     async handle(message: SerializedMessage<any> | void) {

@@ -12,7 +12,7 @@ import { createDBConnection } from '@/database';
 import { initLogging, logger } from '@/logging';
 
 import type { ChannelResponse } from '@shared/communication/interfaces';
-import {  resolverBridge } from '@/core/active_channels'
+import { resolverBridge } from '@/core/active_channels'
 
 // -- code body
 
@@ -54,6 +54,9 @@ async function main() {
 
     logger.debug("Connecting to database");
     await createDBConnection();
+
+    await resolverBridge.onStart();
+
     setupExpressApp();
 
     logger.info("Application Ready [NodeJS]:");
