@@ -1,29 +1,35 @@
-import cn from 'classnames'
+import React from "react";
+import cn from "classnames";
+
+import { CartStoreContext } from "./store";
 
 export const financialInputProps = {
   allowNumericCharactersOnly: true,
   clampValueOnBlur: true,
   minorStepSize: null,
   stepSize: 1,
-  min: 0
+  min: 0,
 };
-
 
 /* https://stackoverflow.com/a/2901298 */
 export function numberWithCommas(x: number | string) {
-    var parts = x.toString().split(".");
-    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  var parts = x.toString().split(".");
+  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
-    if (parts.length == 2) {
-      parts[1] = parts[1].substring(0, 2);
-    }
+  if (parts.length == 2) {
+    parts[1] = parts[1].substring(0, 2);
+  }
 
-    return parts.join(".");
+  return parts.join(".");
 }
 
 export const StatRow = ({ title, value, ...rest }) => (
-  <div {...rest} className={cn("fin-row fin-row-margin", rest.className || '')}>
+  <div {...rest} className={cn("fin-row fin-row-margin", rest.className || "")}>
     <span className="t">{title}</span>
     <span className="v">{numberWithCommas(value)}</span>
   </div>
 );
+
+export function useStores() {
+  return React.useContext(CartStoreContext)!;
+}

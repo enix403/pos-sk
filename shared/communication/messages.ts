@@ -70,7 +70,7 @@ export namespace MSG {
                     customer_id: number | null, /* TODO: Devise a proper mechanism for transferring ids of entities */
                     amount_paid: number
                 };
-                cart: CartItems[];
+                cart: CartItem[];
             };
         };
 

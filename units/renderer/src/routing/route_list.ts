@@ -8,9 +8,6 @@ export const appRoutes = {
         updateStock: { name: "Update Stock", path: "/stock/update-stock" },
         storeItems: { name: "Store Items", path: "/store/store-items" }
     },
-    customer: {
-        cart: { name: "Customer Checkout", path: "/customer/checkout" },
-    }
 }
 
 export const devAppRoutes = {

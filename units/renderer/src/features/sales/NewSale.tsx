@@ -30,15 +30,7 @@ const onDialogClose = action(() => {
 
 export const NewSaleView = () => {
   React.useEffect(() => {
-    invStore.fetchAvailableItems().then(() => {
-      /*
-      cartStore.addItem(invStore.allItems[0]);
-      cartStore.addItem(invStore.allItems[1]);
-      cartStore.addItem(invStore.allItems[2]);
-      cartStore.addItem(invStore.allItems[2]);
-      cartStore.addItem(invStore.allItems[3]);
-      */
-    });
+    invStore.fetchAvailableItems();
   }, []);
   return (
     <CartStoreContext.Provider value={rootStore}>
@@ -51,7 +43,6 @@ export const NewSaleView = () => {
       <Observer>
         {() => (
           <CheckoutConfirmDialog
-            store={cartStore}
             isOpen={cartStore.stage == POSStage.Checkout}
             onConfirm={onDialogCofirm}
             onClose={onDialogClose}
