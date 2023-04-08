@@ -40,10 +40,12 @@ export class StockChannel extends IpcChannel {
 
     public override async onStart(): Promise<void> {
         logger.info("onStart() called from StockChannel");
+        /* 
         const em = EFORK();
 
         this.itemsIndex = await em.find(StoreItem,
             {}, { populate: entt_relation_list<StoreItem>('attributes') });
+        */
 
     }
 

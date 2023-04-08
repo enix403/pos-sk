@@ -4,9 +4,10 @@
 import { Identified } from '../tsutils';
 import { Message } from './interfaces';
 import { IStoreItem } from '../contracts/IStoreItem';
-import { IStockUpdatePayload } from '@shared/contracts/IStockUpdate';
-import { IItemStock } from '@shared/contracts/IItemStock';
-import { SaleMethod } from '@shared/contracts/ISale';
+import { IStockUpdatePayload } from '../contracts/IStockUpdate';
+import { IItemStock } from '../contracts/IItemStock';
+import { ISaleCartItem, SaleMethod } from '../contracts/ISale';
+import { ICustomer } from '../contracts/ICustomer';
 
 abstract class SimpleMessage<T, K> extends Message<T, K> {
     constructor(payload: T) {
@@ -67,10 +68,11 @@ export namespace MSG {
             export interface Capture {
                 meta: {
                     method: SaleMethod,
-                    customer_id: number | null, /* TODO: Devise a proper mechanism for transferring ids of entities */
+                    customer_id: number | null,
+                    discount: number,
                     amount_paid: number
                 };
-                cart: CartItem[];
+                cart: ISaleCartItem[];
             };
         };
 
@@ -86,6 +88,9 @@ export namespace MSG {
     export namespace Customer {
         export class AddCustomer extends SimpleMessage<{ name: string }, void>
         { static ACTION_NAME = 'cust:add'; }
+
+        export class GetCustomers extends SimpleMessage<void, Array<Identified<ICustomer>>>
+        { static ACTION_NAME = 'cust:list'; }
     }
 
     /* ============================================ */

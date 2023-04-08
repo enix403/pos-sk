@@ -91,6 +91,11 @@
 .panel-stats {
     padding: 0 24px;
 
+    // display: flex;
+    // flex-direction: column;
+    // justify-content: flex-end;
+    // align-items: stretch;
+
     .box-row {
         display: flex;
         align-items: stretch;
@@ -126,9 +131,22 @@
             font-weight: 700;
             // color: #CD4246;
         }
+
+        .value-str {
+            margin-top: 8px;
+            font-size: 1.1rem;
+            font-family: 'Fira Code';
+            font-weight: 700;
+            text-transform: uppercase;
+        }
     }
 
     .box.box-1 .value { color: #634DBF; }
     .box.box-2 .value { color: #CD4246; }
     .box.box-3 .value { color: #238551; }
+    .box.box-4 .value { color: #BF4B72; }
+    .box.box-5 .value { color: #4B6AB2; }
+
+    .box.box-met .value-str { color: #B85033; }
+
 }

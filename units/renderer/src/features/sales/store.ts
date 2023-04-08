@@ -2,38 +2,44 @@ import { createContext } from 'react'
 import { makeAutoObservable, makeObservable, observable } from 'mobx'
 
 import type { Identified } from '@shared/tsutils'
-import { IStoreItem, UnitDescription, fromSlug, applySubUnit } from '@shared/contracts/IStoreItem'
-import { SaleMethod } from '@shared/contracts/ISale'
+import { ISaleCartItem, SaleMethod } from '@shared/contracts/ISale'
 import { IItemStock } from '@shared/contracts/IItemStock'
 
 import { DUMMY_ITEMS } from './temp_items'
 import type { CustomerResource } from './CreditCustomerSelect';
 
-import { MSG } from '@shared/communication';
 import { MessageTracker } from '@/features/MessageTracker';
 import { simpleErrorAlert, isResponseSuccessful, formatResponseErrorLog } from '@/utils';
-
+import { MSG } from '@shared/communication';
+import { Units, Quantity } from '@shared/contracts/unit'
 
 export type ItemResource = Identified<IItemStock>;
 
 export class CartItem {
     store: CartStore
     itemResource: ItemResource;
-    quantity: number;
-    subQuantity: number;
+    quantity: Quantity;
     price: number;
 
     constructor(store: CartStore, item: ItemResource) {
         this.store = store;
         this.itemResource = item;
         this.price = item.item.retail_price;
-        this.quantity = 1;
-        this.subQuantity = 0;
+
+        let unit = Units.fromSlug(item.item.unit);
+
+        if (unit == null) {
+            throw new Error(`Unit "${this.rawItem.unit}" not found`);
+        }
+
+        this.quantity = new Quantity(unit, 1, 0);
+        makeObservable(this.quantity, { base: true, fractional: true });
 
         makeAutoObservable(this, {
             store: false,
             itemResource: false,
             rawItem: false,
+            pack: false,
         });
     }
 
@@ -41,48 +47,41 @@ export class CartItem {
         return this.itemResource.item;
     }
 
-    get unitDesc(): UnitDescription {
-        const unit = fromSlug(this.rawItem.unit);
-        if (unit == null)
-            throw new Error(`Unit "${this.rawItem.unit}" not found`);
-
-        return unit;
-    }
-
     setQuantity(qty: number) {
         if (!isNaN(qty))
-            this.quantity = Math.floor(qty);
+            this.quantity.base = Math.floor(qty);
     }
 
     setSubQuantity(qty: number) {
         if (!isNaN(qty))
-            this.subQuantity = Math.floor(qty);
+            this.quantity.fractional = Math.floor(qty);
     }
 
     get realQuantity(): number {
-        const unit = this.unitDesc;
-
-        if (unit.subUnit == null)
-            return this.quantity;
-
-        return this.quantity + applySubUnit(unit, this.subQuantity);
+        return this.quantity.effectiveValue();
     }
 
     get subtotal(): number {
-        return this.realQuantity * this.price;
+        return this.quantity.applyPrice(this.price);
     }
 
     quantityInc() {
-        ++this.quantity;
+        ++this.quantity.base;
     }
 
     quantityDec() {
-        if (this.quantity > 1)
-            --this.quantity;
+        --this.quantity.base;
     }
 
     remove() {
         this.store.removeItem(this);
+    }
+
+    pack(): ISaleCartItem {
+        return {
+            item_id: this.rawItem.id,
+            quantity: this.quantity.pack()
+        };
     }
 };
 
@@ -144,7 +143,7 @@ export class CartStore {
         if (!old)
             this.items.push(new CartItem(this, storeItem));
         else
-            old.quantity++;
+            old.quantityInc();
     }
 
     removeItem(item: CartItem) {
@@ -162,15 +161,18 @@ export class CartStore {
     }
 
     get itemCount(): number {
-        return this.items.reduce((acc, item) => {
-            // Count non-piece units as single item regardless of specified quantiy
-            // BUT if their quantity is 0 then it is an error and must be reported.
-            let q = item.realQuantity;
-            if (q != 0 && item.unitDesc.subUnit != null)
-                q = 1;
+        return this.items
+            .map((t) => {
+                let qty = t.quantity;
+                let value = qty.effectiveValue();
+                if (value == 0)
+                    return 0;
 
-            return acc + q;
-        }, 0);
+                if (qty.unit.isPiece())
+                    return value;
+                else
+                    return 1;
+            }).reduce((a, b) => a + b, 0);
     }
 
     get billAmount(): number {

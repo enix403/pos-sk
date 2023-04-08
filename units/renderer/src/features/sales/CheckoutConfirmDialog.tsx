@@ -6,6 +6,7 @@ import cn from "classnames";
 import { Classes, Dialog, Button } from "@blueprintjs/core";
 
 import { numberWithCommas, useStores } from "./common";
+import { SaleMethod } from "@/../../../shared/contracts/ISale";
 
 const ItemsTable = () => {
   const { cartStore } = useStores();
@@ -34,7 +35,10 @@ const ItemsTable = () => {
             <td className="cell-num">{index + 1}</td>
             <td className="cell-item">{itCart.rawItem.name}</td>
             <td className="cell-price">{itCart.price}</td>
-            <td className="cell-qty">{itCart.realQuantity}</td>
+            <td className="cell-qty">
+              {numberWithCommas(itCart.quantity.absoluteValue())}{" "}
+              {itCart.quantity.unit.shortName}
+            </td>
             <td className="cell-subtotal">{itCart.subtotal}</td>
           </tr>
         ))}
@@ -42,6 +46,17 @@ const ItemsTable = () => {
     </table>
   );
 };
+
+function RenderMethodText(met: SaleMethod) {
+  if (met == SaleMethod.Direct)
+    //
+    return "Cash";
+  else if (met == SaleMethod.Credit)
+    //
+    return "Credit";
+
+  return "-";
+}
 
 interface ICheckoutConfirmDialogProps {
   isOpen: boolean;
@@ -99,6 +114,25 @@ export const CheckoutConfirmDialog: React.FC<ICheckoutConfirmDialogProps> = ({
               <p className="title">Total Payable</p>
               <p className="value">{numberWithCommas(store.payable)}</p>
             </div>
+          </div>
+          <div className="box-row margin-t-xl">
+            <div className="box box-met">
+              <p className="title">Sale Method</p>
+              <p className="value-str">{RenderMethodText(store.method)}</p>
+            </div>
+
+            {store.method == SaleMethod.Direct ? (
+              <>
+                <div className="box box-4">
+                  <p className="title">Amount Paid</p>
+                  <p className="value">{numberWithCommas(store.amountPaid)}</p>
+                </div>
+                <div className="box box-5">
+                  <p className="title">Change</p>
+                  <p className="value">{numberWithCommas(store.cashChange)}</p>
+                </div>
+              </>
+            ) : null}
           </div>
         </div>
       </div>

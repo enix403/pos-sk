@@ -1,11 +1,17 @@
-import React from 'react'
+import React, { useEffect } from "react";
 
-import {
-  MenuItem,
-  FormGroup,
-} from '@blueprintjs/core'
+import { MenuItem, FormGroup } from "@blueprintjs/core";
 
 import { Suggest } from "@blueprintjs/select";
+import { Identified } from "@shared/tsutils";
+import { ICustomer } from "@shared/contracts/ICustomer";
+import { MSG } from "@shared/communication";
+import {
+  isResponseSuccessful,
+  formatResponseErrorLog,
+  simpleErrorAlert,
+} from "@/utils";
+
 const flags = {
   allowCreate: false,
   closeOnSelect: true,
@@ -15,14 +21,14 @@ const flags = {
   resetOnSelect: false,
 };
 
-export type CustomerResource = { id: number, name: string };
+export type CustomerResource = Identified<ICustomer>;
 
-const ALL_CUSTOMERS: CustomerResource[] = [
-  {id: 1, name: "ABC 1"},
-  {id: 2, name: "DEF 2"},
-  {id: 3, name: "GHI 3"},
-  {id: 4, name: "JKL 4"},
-];
+// const ALL_CUSTOMERS = [
+//   { id: 1, name: "ABC 1" },
+//   { id: 2, name: "DEF 2" },
+//   { id: 3, name: "GHI 3" },
+//   { id: 4, name: "JKL 4" },
+// ];
 
 const filterCustomer = (query, customer, _index, exactMatch) => {
   const normalizedTitle = customer.name.toLowerCase();
@@ -36,8 +42,7 @@ const filterCustomer = (query, customer, _index, exactMatch) => {
 };
 
 const renderCustomer = (customer, { handleClick, modifiers }) => {
-  if (!modifiers.matchesPredicate)
-    return null;
+  if (!modifiers.matchesPredicate) return null;
 
   return (
     <MenuItem
@@ -50,21 +55,42 @@ const renderCustomer = (customer, { handleClick, modifiers }) => {
   );
 };
 
-export const CreditCustomerSelect = ({value, setValue}) => (
-  <FormGroup label="Customer Name">
-    <Suggest<any>
-      {...flags}
-      popoverProps={{ minimal: true }}
-      fill
-      inputProps={{ large: true, leftIcon: 'person'}}
-      items={ALL_CUSTOMERS}
-      itemRenderer={renderCustomer}
-      selectedItem={value}
-      onItemSelect={(c) => setValue(c)}
-      inputValueRenderer={(customer) => customer.name}
-      itemsEqual={(a, b) => a.id == b.id}
-      itemPredicate={filterCustomer}
-      noResults={<MenuItem disabled={true} text="No results." />}
-    />
-  </FormGroup>
-);
+export const CreditCustomerSelect = ({ value, setValue }) => {
+  let [customerList, setCustomerList] = React.useState<CustomerResource[]>([]);
+
+  useEffect(() => {
+    window.SystemBackend.sendMessage(new MSG.Customer.GetCustomers()).then(
+      (res) => {
+        if (!isResponseSuccessful(res)) {
+          console.error(
+            "InventoryStore::fetchAvailableItems(): Failed to complete message:",
+            formatResponseErrorLog(res)
+          );
+          simpleErrorAlert("Could not fetch available customers");
+          return;
+        }
+
+        setCustomerList(res.data!);
+      }
+    );
+  }, []);
+
+  return (
+    <FormGroup label="Customer Name">
+      <Suggest<any>
+        {...flags}
+        popoverProps={{ minimal: true }}
+        fill
+        inputProps={{ large: true, leftIcon: "person" }}
+        items={customerList}
+        itemRenderer={renderCustomer}
+        selectedItem={value}
+        onItemSelect={(c) => setValue(c)}
+        inputValueRenderer={(customer) => customer.name}
+        itemsEqual={(a, b) => a.id == b.id}
+        itemPredicate={filterCustomer}
+        noResults={<MenuItem disabled={true} text="No results." />}
+      />
+    </FormGroup>
+  );
+};

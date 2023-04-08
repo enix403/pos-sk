@@ -1,13 +1,13 @@
-import { IStoreItem, StoreItemFamily, availableUnits } from '@shared/contracts/IStoreItem';
-
+import { IStoreItem, StoreItemFamily } from '@shared/contracts/IStoreItem';
+import { Units } from '@shared/contracts/unit';
 
 /**
  * Converts an item-unit to its string representation
  * */
 export function SItemUnitText(unitSlug: string): string {
-    const result = availableUnits.find(unit => unit.slug == unitSlug);
+    const result = Units.fromSlug(unitSlug);
     if (result != undefined)
-        return result.title;
+        return result.name;
 
     return unitSlug;
 }
@@ -16,7 +16,7 @@ export function SItemUnitText(unitSlug: string): string {
  * Converts StoreItemFamily to its string representation
  * */
 export function SItemFamilyText(f: StoreItemFamily): string {
-    switch(f) {
+    switch (f) {
         case StoreItemFamily.TradeItem: return 'Trade Item'
         case StoreItemFamily.SelfBrand: return 'Self Branded'
 

@@ -20,7 +20,7 @@ export class MsgDispatch<T, K>
     constructor(
         public readonly msgKlass: MessageFactory<T, K>,
         public readonly handler: MessageHandler<Message<T, K>>
-    ) {}
+    ) { }
 }
 
 export class IpcChannel {
@@ -28,7 +28,7 @@ export class IpcChannel {
 
     public getHandlers = () => this.handlers;
 
-    public async onStart(): Promise<void> {}
+    public async onStart(): Promise<void> { }
 
     protected register<T, K>(
         dispatch: MsgDispatch<T, K>
@@ -63,7 +63,7 @@ export class RequestBridge {
         if (reg)
             return reg(message.payload || {});
 
-        throw new Error("Invalid action.");
+        throw new Error(`Invalid action '${message.action}'`);
     }
 
 

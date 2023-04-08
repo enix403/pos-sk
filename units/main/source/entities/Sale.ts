@@ -31,9 +31,13 @@ export class SaleItem extends SimpleEntity {
     public sale: IdentifiedReference<Sale>;
     public item: IdentifiedReference<StoreItem>;
 
-    public item_unit_count: number;
+    public qty_uniy_slug: number;
+    public qty_effective_val: number;
+
     public item_cost_price: number;
     public item_retail_price: number;
+
+    public subtotal: number;
 }
 
 export const SaleSchema = new EntitySchema<Sale, SimpleEntity>({
@@ -55,8 +59,10 @@ export const SaleItemSchema = new EntitySchema<SaleItem, SimpleEntity>({
     properties: {
         sale: CreateEnttRef(() => Sale),
         item: CreateEnttRef(() => StoreItem),
-        item_unit_count: { type: Number, unsigned: false, nullable: false },
+        qty_uniy_slug: { type: String, nullable: false },
+        qty_effective_val: { type: Number, unsigned: false, nullable: false },
         item_cost_price: { type: Number, unsigned: false, nullable: false },
         item_retail_price: { type: Number, unsigned: false, nullable: false },
+        subtotal: { type: Number, unsigned: false, nullable: false },
     }
 });

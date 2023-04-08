@@ -1,21 +1,35 @@
-import React from 'react'
+import React from "react";
 
-import { NavPageView } from '@/layout/views'
-import { mergeRefs, getRef, Divider, Button, Intent, Card, ControlGroup, FormGroup, HTMLSelect, InputGroup, TextArea, Tag, Spinner } from '@blueprintjs/core'
+import { NavPageView } from "@/layout/views";
+import {
+  mergeRefs,
+  getRef,
+  Divider,
+  Button,
+  Intent,
+  Card,
+  ControlGroup,
+  FormGroup,
+  HTMLSelect,
+  InputGroup,
+  TextArea,
+  Tag,
+  Spinner,
+} from "@blueprintjs/core";
 import { Popover2, Tooltip2 } from "@blueprintjs/popover2";
-import { Form, Field } from 'react-final-form';
-import { Container, Row, Col } from 'react-grid-system';
+import { Form, Field } from "react-final-form";
+import { Container, Row, Col } from "react-grid-system";
 
-import type { Config } from 'final-form';
-import type { FormRenderProps } from 'react-final-form';
+import type { Config } from "final-form";
+import type { FormRenderProps } from "react-final-form";
 import {
   composeValidators,
   processMeta,
   required,
   minValue,
-  mustBeNumber
-} from '@/components/fields'
-import { sleep } from '@shared/commonutils';
+  mustBeNumber,
+} from "@/components/fields";
+import { sleep } from "@shared/commonutils";
 import {
   blurAllInputs,
   isResponseSuccessful,
@@ -23,17 +37,21 @@ import {
   formatResponseErrorLog,
   simpleErrorAlert,
   simpleSuccessAlert,
-} from '@/utils'
-import { Identified } from '@shared/tsutils';
+} from "@/utils";
+import { Identified } from "@shared/tsutils";
 
-import { StoreItemFamily, IStoreItemAttribute, IStoreItem, availableUnits } from '@shared/contracts/IStoreItem';
-import { IItemStock } from '@shared/contracts/IItemStock';
-import { MSG } from '@shared/communication';
-import { MessageTracker } from '@/features/MessageTracker';
-import * as omaps from '@/features/object_maps';
+import {
+  StoreItemFamily,
+  IStoreItemAttribute,
+  IStoreItem,
+} from "@shared/contracts/IStoreItem";
+import { Units } from "@shared/contracts/unit";
+import { IItemStock } from "@shared/contracts/IItemStock";
+import { MSG } from "@shared/communication";
+import { MessageTracker } from "@/features/MessageTracker";
+import * as omaps from "@/features/object_maps";
 
-
-type FinalFormSubmit<T> = Config<T>['onSubmit'];
+type FinalFormSubmit<T> = Config<T>["onSubmit"];
 
 interface IAttributesRowProps {
   id: any;
@@ -47,7 +65,7 @@ interface IAttributesRowProps {
 
   onStatusChange: (id: any) => void;
   onRemove: (id: any) => void;
-};
+}
 
 function AttributesRow(props: IAttributesRowProps) {
   const { editing } = props;
@@ -61,45 +79,52 @@ function AttributesRow(props: IAttributesRowProps) {
             fill={true}
             intent={inputIntent}
             readOnly={!editing}
-            leftElement={<Tag minimal intent="success">Name: </Tag>}
-
+            leftElement={
+              <Tag minimal intent="success">
+                Name:{" "}
+              </Tag>
+            }
             value={props.name}
-            onChange={e => props.onNameChange(props.id, e.target.value)}
+            onChange={(e) => props.onNameChange(props.id, e.target.value)}
           />
           <InputGroup
             placeholder="Attribute value"
             fill={true}
             intent={inputIntent}
             readOnly={!editing}
-            leftElement={<Tag minimal intent="success">Value: </Tag>}
-
+            leftElement={
+              <Tag minimal intent="success">
+                Value:{" "}
+              </Tag>
+            }
             value={props.value}
-            onChange={e => props.onValueChange(props.id, e.target.value)}
+            onChange={(e) => props.onValueChange(props.id, e.target.value)}
           />
         </ControlGroup>
       </Col>
       <Col xs="content">
         <Button
           className="margin-r-l"
-          onClick={e => props.onStatusChange(props.id)}
+          onClick={() => props.onStatusChange(props.id)}
           text={editing ? "Save" : "Edit"}
           intent={editing ? "success" : "primary"}
-          rightIcon={editing ? "floppy-disk" : "edit"} />
+          rightIcon={editing ? "floppy-disk" : "edit"}
+        />
         <Button
-          onClick={e => props.onRemove(props.id)}
+          onClick={() => props.onRemove(props.id)}
           text="Remove"
           intent="danger"
-          rightIcon="cross" />
+          rightIcon="cross"
+        />
       </Col>
     </Row>
   );
 }
 
 class AttributesList extends React.Component<{}, AttributesList.State> {
-
   public state: AttributesList.State = {
     attrs: {},
-    currentlyEditingID: null
+    currentlyEditingID: null,
   };
 
   private nextId = 1;
@@ -108,12 +133,9 @@ class AttributesList extends React.Component<{}, AttributesList.State> {
     super(props);
   }
 
-
   public reset() {
     this.nextId = 1;
-    this.updateAttr(
-      { id: this.nextId++, name: "Size", value: "" }
-    );
+    this.updateAttr({ id: this.nextId++, name: "Size", value: "" });
   }
 
   componentDidMount() {
@@ -124,7 +146,7 @@ class AttributesList extends React.Component<{}, AttributesList.State> {
     const id = this.nextId++;
     this.updateAttr({ id, name: "", value: "" });
     this.setState({ currentlyEditingID: id });
-  }
+  };
 
   public toArray(): AttributesList.AttrObject[] {
     return Object.values(this.state.attrs).filter(Boolean) as any;
@@ -133,8 +155,7 @@ class AttributesList extends React.Component<{}, AttributesList.State> {
   private updateAttr(...attrs: AttributesList.AttrObject[]) {
     // this.setState({ attrs: { ...this.state.attrs, [attr.id]: attr } })
     const stateAttrs = Object.assign({}, this.state.attrs);
-    for (const a of attrs)
-      stateAttrs[a.id] = a;
+    for (const a of attrs) stateAttrs[a.id] = a;
 
     this.setState({ attrs: stateAttrs });
   }
@@ -142,25 +163,29 @@ class AttributesList extends React.Component<{}, AttributesList.State> {
   private onAttrStatusChange = (id: AttributesList.AttrObjectID) => {
     let editId = this.state.currentlyEditingID;
 
-    if (editId == id)
-      editId = null;
-    else
-      editId = id;
+    if (editId == id) editId = null;
+    else editId = id;
 
     this.setState({ currentlyEditingID: editId });
   };
 
-  private onAttrNameChange = (id: AttributesList.AttrObjectID, name: string) => {
+  private onAttrNameChange = (
+    id: AttributesList.AttrObjectID,
+    name: string
+  ) => {
     const attr = Object.assign({}, this.state.attrs[id]);
     attr.name = name;
     this.updateAttr(attr);
-  }
+  };
 
-  private onAttrValueChange = (id: AttributesList.AttrObjectID, value: string) => {
+  private onAttrValueChange = (
+    id: AttributesList.AttrObjectID,
+    value: string
+  ) => {
     const attr = Object.assign({}, this.state.attrs[id]);
     attr.value = value;
     this.updateAttr(attr);
-  }
+  };
 
   private onAttrRemove = (id: AttributesList.AttrObjectID) => {
     const attrs = Object.assign({}, this.state.attrs);
@@ -168,12 +193,11 @@ class AttributesList extends React.Component<{}, AttributesList.State> {
     this.setState({ attrs });
     if (this.state.currentlyEditingID == id)
       this.setState({ currentlyEditingID: null });
-  }
+  };
 
   render() {
     return (
       <Container>
-
         <Row className="margin-t-m margin-b-xl">
           <Col className="center-text-flow">
             <h5 className="bp3-heading">Product Attributes</h5>
@@ -184,18 +208,18 @@ class AttributesList extends React.Component<{}, AttributesList.State> {
               intent="danger"
               outlined
               onClick={this.addAttribute}
-              rightIcon="add" />
+              rightIcon="add"
+            />
           </Col>
         </Row>
 
-        {this.toArray().map(item => (
+        {this.toArray().map((item) => (
           <AttributesRow
             key={item.id}
             id={item.id}
             name={item.name}
             value={item.value}
             editing={item.id == this.state.currentlyEditingID}
-
             onNameChange={this.onAttrNameChange}
             onValueChange={this.onAttrValueChange}
             onStatusChange={this.onAttrStatusChange}
@@ -219,8 +243,10 @@ namespace AttributesList {
   }
 }
 
-class StoreItemForm extends React.Component<StoreItemForm.Props, StoreItemForm.State> {
-
+class StoreItemForm extends React.Component<
+  StoreItemForm.Props,
+  StoreItemForm.State
+> {
   private START_SCAN_INFO = "Click to start scanning";
   private STOP_SCAN_INFO = "Click to cancel scanning";
 
@@ -230,7 +256,7 @@ class StoreItemForm extends React.Component<StoreItemForm.Props, StoreItemForm.S
   public state: StoreItemForm.State = {
     pcode_enabled: false,
     pcode: "",
-    scanning: false
+    scanning: false,
   };
 
   constructor(props) {
@@ -245,32 +271,36 @@ class StoreItemForm extends React.Component<StoreItemForm.Props, StoreItemForm.S
   private handleCodeStatusChange = (e: any) => {
     const enabled = e.target.value == "yes";
     this.setState({ pcode_enabled: enabled });
-    if (!enabled)
-      this.setState({ scanning: false });
+    if (!enabled) this.setState({ scanning: false });
   };
 
   private onScanStatusChange = () => {
     const oldStatus: boolean = this.state.scanning;
     if (oldStatus) {
       this.setState({ scanning: false });
-    }
-    else {
-      this.setState({
-        pcode_enabled: true,
-        scanning: true,
-        pcode: ""
-      }, () => this.codeInputRef.current!.focus());
+    } else {
+      this.setState(
+        {
+          pcode_enabled: true,
+          scanning: true,
+          pcode: "",
+        },
+        () => this.codeInputRef.current!.focus()
+      );
     }
   };
 
   private onScanBlur = () => {
-    setTimeout(() => this.state.scanning && this.setState({ scanning: false }), 200);
-  }
+    setTimeout(
+      () => this.state.scanning && this.setState({ scanning: false }),
+      200
+    );
+  };
 
   private onFormSubmit: StoreItemForm.OnSubmitType = async (values, form) => {
     const list = this.attributeListsRef.current!;
     // const attributes = list.toArray().filter(obj => obj.value.trim() != "");
-    const attributes = list.toArray().filter(obj => obj.value.trim() != "");
+    const attributes = list.toArray().filter((obj) => obj.value.trim() != "");
 
     let pcode_enabled = this.state.pcode_enabled;
 
@@ -278,13 +308,12 @@ class StoreItemForm extends React.Component<StoreItemForm.Props, StoreItemForm.S
       ...(values as Required<typeof values>),
       pcode_enabled: pcode_enabled,
       pcode: pcode_enabled ? this.state.pcode : null,
-      attributes
+      attributes,
     };
 
     try {
       await this.props.onSave(result);
-    }
-    catch (e) {
+    } catch (e) {
       return;
     }
 
@@ -300,8 +329,8 @@ class StoreItemForm extends React.Component<StoreItemForm.Props, StoreItemForm.S
         subscription={{ submitting: true }}
         initialValues={{
           family: StoreItemFamily.TradeItem,
-          unit: 'piece',
-          description: ""
+          unit: "piece",
+          description: "",
         }}
       >
         {(rprops) => (
@@ -321,7 +350,8 @@ class StoreItemForm extends React.Component<StoreItemForm.Props, StoreItemForm.S
               text="Save Item"
               intent="primary"
               className="margin-t-l padding-h-l"
-              rightIcon="confirm" />
+              rightIcon="confirm"
+            />
           </React.Fragment>
         )}
       </Form>
@@ -339,11 +369,15 @@ class StoreItemForm extends React.Component<StoreItemForm.Props, StoreItemForm.S
               {({ input, meta }) => {
                 const { intent, hasError } = processMeta(meta);
                 return (
-                  <FormGroup label="Item Name" intent={intent} helperText={hasError && meta.error}>
+                  <FormGroup
+                    label="Item Name"
+                    intent={intent}
+                    helperText={hasError && meta.error}
+                  >
                     <InputGroup
                       placeholder="Enter the item name"
                       fill={true}
-                      leftIcon='layers'
+                      leftIcon="layers"
                       intent={intent}
                       {...input}
                     />
@@ -351,15 +385,24 @@ class StoreItemForm extends React.Component<StoreItemForm.Props, StoreItemForm.S
                 );
               }}
             </Field>
-            <FormGroup label={<>Description <small className="bp3-text-muted">(Optional)</small> </>}>
+            <FormGroup
+              label={
+                <>
+                  Description{" "}
+                  <small className="bp3-text-muted">(Optional)</small>{" "}
+                </>
+              }
+            >
               <Field name="description">
-                {({ input }) => (<TextArea
-                  growVertically={true}
-                  fill={true}
-                  placeholder={"Enter description"}
-                  rows={6}
-                  {...input}
-                />)}
+                {({ input }) => (
+                  <TextArea
+                    growVertically={true}
+                    fill={true}
+                    placeholder={"Enter description"}
+                    rows={6}
+                    {...input}
+                  />
+                )}
               </Field>
             </FormGroup>
           </Col>
@@ -368,15 +411,22 @@ class StoreItemForm extends React.Component<StoreItemForm.Props, StoreItemForm.S
           <Col md={7}>
             <FormGroup label="Product Type">
               <Field name="family">
-                {({ input: { multiple, ...restInput } }) => (<HTMLSelect fill={true} {...restInput}>
-                  <option value="trade_item">Trade Item</option>
-                  <option value="self_brand">Self Branded</option>
-                </HTMLSelect>)}
+                {({ input: { multiple, ...restInput } }) => (
+                  <HTMLSelect fill={true} {...restInput}>
+                    <option value="trade_item">Trade Item</option>
+                    <option value="self_brand">Self Branded</option>
+                  </HTMLSelect>
+                )}
               </Field>
             </FormGroup>
           </Col>
           <Col md={16} lg={10}>
-            <FormGroup label="Product Code" helperText={"Enable product code and enter code, or press \"Scan\" and physically scan the item to automatically read the code"}>
+            <FormGroup
+              label="Product Code"
+              helperText={
+                'Enable product code and enter code, or press "Scan" and physically scan the item to automatically read the code'
+              }
+            >
               <ControlGroup>
                 <HTMLSelect
                   value={this.state.pcode_enabled ? "yes" : "no"}
@@ -386,18 +436,26 @@ class StoreItemForm extends React.Component<StoreItemForm.Props, StoreItemForm.S
                   <option value="yes">Enabled</option>
                 </HTMLSelect>
                 <InputGroup
-                  placeholder={currentlyScanning ? "Use the scanner to scan the code...." : "Enter the code"}
+                  placeholder={
+                    currentlyScanning
+                      ? "Use the scanner to scan the code...."
+                      : "Enter the code"
+                  }
                   intent={currentlyScanning ? "warning" : "none"}
                   disabled={!this.state.pcode_enabled}
                   fill={true}
                   leftIcon="tag"
                   value={this.state.pcode}
-                  onChange={e => this.setState({ pcode: e.target.value })}
+                  onChange={(e) => this.setState({ pcode: e.target.value })}
                   onBlur={this.onScanBlur}
                   inputRef={this.codeInputRef}
                 />
                 <Tooltip2
-                  content={currentlyScanning ? this.STOP_SCAN_INFO : this.START_SCAN_INFO}
+                  content={
+                    currentlyScanning
+                      ? this.STOP_SCAN_INFO
+                      : this.START_SCAN_INFO
+                  }
                   inheritDarkTheme
                   openOnTargetFocus={false}
                   intent={currentlyScanning ? "warning" : "primary"}
@@ -423,23 +481,34 @@ class StoreItemForm extends React.Component<StoreItemForm.Props, StoreItemForm.S
               <Field name="unit">
                 {({ input: { multiple, ...restInput } }) => (
                   <HTMLSelect fill={true} {...restInput}>
-                    {availableUnits.map(desc => (<option key={desc.slug} value={desc.slug}>{desc.title}</option>))}
+                    {Units.all().map((desc) => (
+                      <option key={desc.slug} value={desc.slug}>
+                        {desc.longName}
+                      </option>
+                    ))}
                   </HTMLSelect>
                 )}
               </Field>
             </FormGroup>
           </Col>
           <Col md={16} lg={9}>
-            <Field name="cost_price" validate={composeValidators(mustBeNumber, required, minValue(1))}>
+            <Field
+              name="cost_price"
+              validate={composeValidators(mustBeNumber, required, minValue(1))}
+            >
               {({ input, meta }) => {
                 const { intent, hasError } = processMeta(meta);
                 return (
-                  <FormGroup label="Cost Price" intent={intent} helperText={hasError && meta.error}>
+                  <FormGroup
+                    label="Cost Price"
+                    intent={intent}
+                    helperText={hasError && meta.error}
+                  >
                     <InputGroup
                       type="number"
                       placeholder="Enter cost price"
                       fill
-                      leftIcon='dollar'
+                      leftIcon="dollar"
                       intent={intent}
                       {...input}
                     />
@@ -449,16 +518,23 @@ class StoreItemForm extends React.Component<StoreItemForm.Props, StoreItemForm.S
             </Field>
           </Col>
           <Col md={16} lg={9}>
-            <Field name="retail_price" validate={composeValidators(mustBeNumber, required, minValue(1))}>
+            <Field
+              name="retail_price"
+              validate={composeValidators(mustBeNumber, required, minValue(1))}
+            >
               {({ input, meta }) => {
                 const { intent, hasError } = processMeta(meta);
                 return (
-                  <FormGroup label="Retail Price" intent={intent} helperText={hasError && meta.error}>
+                  <FormGroup
+                    label="Retail Price"
+                    intent={intent}
+                    helperText={hasError && meta.error}
+                  >
                     <InputGroup
                       type="number"
                       placeholder="Enter retail price"
                       fill
-                      leftIcon='dollar'
+                      leftIcon="dollar"
                       intent={intent}
                       {...input}
                     />
@@ -490,7 +566,7 @@ namespace StoreItemForm {
   }
 
   export interface Props {
-    onSave: (payload: Action) => Promise<void> | void
+    onSave: (payload: Action) => Promise<void> | void;
   }
 
   export interface State {
@@ -503,13 +579,13 @@ namespace StoreItemForm {
   export type FormRenderPropType = FormRenderProps<Values>;
 }
 
-const StoreItemsList: React.FC<{ rows: Identified<IItemStock>[] }> = ({ rows }) => {
+const StoreItemsList: React.FC<{ rows: Identified<IItemStock>[] }> = ({
+  rows,
+}) => {
   return (
     <div className="table-wrapper">
       <div className="table-header">
-        <span className="title">
-          Store Items Added
-        </span>
+        <span className="title">Store Items Added</span>
         <Button
           text="Export To Excel"
           rightIcon="export"
@@ -532,11 +608,16 @@ const StoreItemsList: React.FC<{ rows: Identified<IItemStock>[] }> = ({ rows }) 
             </tr>
           </thead>
           <tbody>
-            {rows.map(row =>
+            {rows.map((row) => (
               <tr key={row.item.id}>
-                <td>{row.item.pcode_std != "none" ? row.item.pcode : "-none-"}</td>
+                <td>
+                  {row.item.pcode_std != "none" ? row.item.pcode : "-none-"}
+                </td>
                 <td>{row.item.name}</td>
-                <td className="al" style={{ maxWidth: "150px", whiteSpace: "normal" }}>
+                <td
+                  className="al"
+                  style={{ maxWidth: "150px", whiteSpace: "normal" }}
+                >
                   {omaps.SItemAttrListText(row.item)}
                 </td>
                 <td>{omaps.SItemFamilyText(row.item.family)}</td>
@@ -545,7 +626,7 @@ const StoreItemsList: React.FC<{ rows: Identified<IItemStock>[] }> = ({ rows }) 
                 <td>{row.item.retail_price}</td>
                 <td>{row.item.active ? "Yes" : "No"}</td>
               </tr>
-            )}
+            ))}
           </tbody>
         </table>
       </div>
@@ -559,52 +640,54 @@ namespace ManageStoreItemsView {
     allStoreItems: Identified<IItemStock>[];
   }
 }
-export class ManageStoreItemsView extends React.Component<{}, ManageStoreItemsView.State> {
-
+export class ManageStoreItemsView extends React.Component<
+  {},
+  ManageStoreItemsView.State
+> {
   private getStocks = new MessageTracker(new MSG.Stock.GetStocks());
 
-  private onItemsReceived: MessageTracker.HandlerAlias<typeof this.getStocks> = (res, msgState) => {
-    this.setState({
-      storeItemsMsg: msgState,
-    });
-
-    if (res == null)
-      return;
-
-    if (isResponseSuccessful(res)) {
-      const items = res.data!;
+  private onItemsReceived: MessageTracker.HandlerAlias<typeof this.getStocks> =
+    (res, msgState) => {
       this.setState({
-        allStoreItems: items,
+        storeItemsMsg: msgState,
       });
-    }
-    else {
-      simpleErrorAlert("Failed to load store items. Try restarting the app");
-      this.setState({ allStoreItems: [] });
-    }
-  }
+
+      if (res == null) return;
+
+      if (isResponseSuccessful(res)) {
+        const items = res.data!;
+        this.setState({
+          allStoreItems: items,
+        });
+      } else {
+        simpleErrorAlert("Failed to load store items. Try restarting the app");
+        this.setState({ allStoreItems: [] });
+      }
+    };
 
   public state: ManageStoreItemsView.State = {
     storeItemsMsg: this.getStocks.getState(),
-    allStoreItems: []
+    allStoreItems: [],
   };
 
   private onItemSave = async (payload: StoreItemForm.Action) => {
+    const res = await window.SystemBackend.sendMessage(
+      new MSG.Stock.CreateStoreItem({
+        pcode_std: payload.pcode_enabled ? "upc" : "none",
+        pcode: payload.pcode,
+        name: payload.name,
+        description: payload.description,
+        family: payload.family,
+        unit: payload.unit,
 
-    const res = await window.SystemBackend.sendMessage(new MSG.Stock.CreateStoreItem({
-      pcode_std: payload.pcode_enabled ? "upc" : "none",
-      pcode: payload.pcode,
-      name: payload.name,
-      description: payload.description,
-      family: payload.family,
-      unit: payload.unit,
+        // : payload.price_per_unit,
+        cost_price: payload.cost_price,
+        retail_price: payload.retail_price,
 
-      // : payload.price_per_unit,
-      cost_price: payload.cost_price,
-      retail_price: payload.retail_price,
-
-      attributes: payload.attributes,
-      active: true,
-    }));
+        attributes: payload.attributes,
+        active: true,
+      })
+    );
 
     if (!isResponseSuccessful(res)) {
       simpleErrorAlert(formatResponseErrorUser(res));
@@ -614,7 +697,7 @@ export class ManageStoreItemsView extends React.Component<{}, ManageStoreItemsVi
 
     simpleSuccessAlert("Item added successfully");
     this.getStocks.sendMessage();
-  }
+  };
 
   componentDidMount() {
     this.getStocks.watch(this.onItemsReceived);
@@ -624,17 +707,16 @@ export class ManageStoreItemsView extends React.Component<{}, ManageStoreItemsVi
     return (
       <NavPageView title="Store Items">
         <Card className="default-card" elevation={2}>
-          <h4 className="bp3-heading header-margin-b-l">
-            Add Store Item
-          </h4>
+          <h4 className="bp3-heading header-margin-b-l">Add Store Item</h4>
 
           <StoreItemForm onSave={this.onItemSave} />
         </Card>
         <Card elevation={2} className="default-card">
-          {this.state.storeItemsMsg.loading ?
-            <Spinner intent="primary" size={120} /> :
+          {this.state.storeItemsMsg.loading ? (
+            <Spinner intent="primary" size={120} />
+          ) : (
             <StoreItemsList rows={this.state.allStoreItems} />
-          }
+          )}
         </Card>
       </NavPageView>
     );

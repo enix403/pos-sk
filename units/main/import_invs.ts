@@ -10,8 +10,9 @@ import { initLogging, logger } from '@/logging';
 
 import { resolveProjectRoot } from '@shared/app_paths';
 
-import { StoreItemFamily, PIECE_UNIT } from '@shared/contracts/IStoreItem';
+import { StoreItemFamily } from '@shared/contracts/IStoreItem';
 import { StoreItem, StoreItemAttribute, ItemStock } from '@/entities';
+import { Units } from '@shared/contracts/unit';
 
 // -- code body
 
@@ -28,7 +29,7 @@ async function main() {
 
     const em = EFORK();
 
-    const filepath = resolveProjectRoot("assets", "f1.csv");
+    const filepath = resolveProjectRoot("assets", "f1-orig.csv");
     let inputStream = fs.createReadStream(filepath, 'utf8');
 
     let items: ItemStock[] = [];
@@ -49,7 +50,7 @@ async function main() {
                 family: StoreItemFamily.TradeItem,
                 name: row[1],
                 description: "",
-                unit: PIECE_UNIT,
+                unit: Units.PIECE_UNIT.slug,
                 cost_price: row[3],
                 retail_price: row[4],
                 active: true
@@ -68,9 +69,9 @@ async function main() {
 
         })
         .on('end', async function () {
-            // console.log('No more rows!');
             // items.forEach(it => em.persist(it));
             // await em.flush();
+            // console.log("Done");
         });
 }
 

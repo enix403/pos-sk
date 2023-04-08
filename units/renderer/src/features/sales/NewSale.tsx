@@ -11,6 +11,7 @@ import { AddItemPanel } from "./AddItemPanel";
 import { FinancialsPanel } from "./FinancialsPanel";
 
 import { CheckoutConfirmDialog } from "./CheckoutConfirmDialog";
+import { Units } from "@shared/contracts/unit";
 
 const { cartStore, invStore } = rootStore;
 
@@ -28,9 +29,25 @@ const onDialogClose = action(() => {
   cartStore.stage = POSStage.Idle;
 });
 
+function fillRandomCart() {
+  const fracItem = invStore.allItems.find((it) =>
+    Units.fromSlug(it.item.unit)?.isFractional()
+  );
+
+  for (let i = 0; i < 50; ++i) {
+    let index = Math.floor(Math.random() * invStore.allItems.length);
+    cartStore.addItem(invStore.allItems[index]);
+    if (fracItem !== undefined && Math.random() < 0.1) {
+      cartStore.addItem(fracItem);
+    }
+  }
+}
+
 export const NewSaleView = () => {
   React.useEffect(() => {
-    invStore.fetchAvailableItems();
+    invStore.fetchAvailableItems().then(() => {
+      fillRandomCart();
+    });
   }, []);
   return (
     <CartStoreContext.Provider value={rootStore}>

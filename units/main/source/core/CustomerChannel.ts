@@ -1,4 +1,3 @@
-import { Reference } from '@mikro-orm/core';
 import { IpcChannel, MsgDispatch } from "@/channel";
 
 import { MSG } from "@shared/communication";
@@ -8,15 +7,11 @@ import {
     Customer,
 } from '@/entities';
 
-import { sleep } from '@shared/commonutils'
-import { logger } from '@/logging'
-
-import { Sale, SaleItem } from '@/entities'
-
 export class CustomerChannel extends IpcChannel {
     constructor() {
         super();
         this.register(this.addCustomer);
+        this.register(this.getCustomers);
     }
 
     private addCustomer = new MsgDispatch(MSG.Customer.AddCustomer, async ({ name }) => {
@@ -27,5 +22,9 @@ export class CustomerChannel extends IpcChannel {
         });
 
         await em.persistAndFlush(cust);
+    });
+
+    private getCustomers = new MsgDispatch(MSG.Customer.GetCustomers, async () => {
+        return EFORK().find(Customer, {});
     });
 }

@@ -14,6 +14,7 @@ import { sleep } from '@shared/commonutils'
 import { logger } from '@/logging'
 
 import { Sale, SaleItem, Customer, ItemStock } from '@/entities'
+import { Quantity } from '@/../../../shared/contracts/unit';
 
 export class SaleChannel extends IpcChannel {
     constructor() {
@@ -22,10 +23,8 @@ export class SaleChannel extends IpcChannel {
         this.register(this.newSale);
     }
 
-    private newSale = new MsgDispatch(MSG.Sale.CreateSale, async (payload) => {
+    private newSale = new MsgDispatch(MSG.Sale.CreateSale, async ({ cart, meta }) => {
         // **TODO**: Check if there are enough units of each item to proceed with the sale
-
-        const { cart, meta } = payload;
 
         if (cart.length == 0)
             return;
@@ -53,22 +52,27 @@ export class SaleChannel extends IpcChannel {
         }
 
         // Preload the required items
-        const cartItemIds: number[] = cart.map(cartItem => cartItem.item.id);
+        const cartItemIds: number[] = cart.map(cartItem => cartItem.item_id);
         const storeItems = await em.find(StoreItem, cartItemIds);
 
         let totalAmount = 0;
 
         for (const cartItem of cart) {
-            const storeItem = storeItems.find(st => st.id == cartItem.item.id)!;
+            const storeItem = storeItems.find(st => st.id == cartItem.item_id)!;
+            const qty = Quantity.fromPacked(cartItem.quantity)!;
+
+            let subtotal = qty.applyPrice(storeItem.retail_price);
 
             const saleItemObject = em.create(SaleItem, {
                 item: Reference.create(storeItem),
-                item_unit_count: cartItem.unit_count,
+                qty_uniy_slug: qty.unit.slug,
+                qty_effective_val: qty.effectiveValue(),
                 item_cost_price: storeItem.cost_price,
                 item_retail_price: storeItem.retail_price,
+                subtotal: subtotal,
             });
 
-            totalAmount += saleItemObject.item_unit_count * saleItemObject.item_retail_price;
+            totalAmount += subtotal;
 
             sale.cart.add(saleItemObject);
         }
