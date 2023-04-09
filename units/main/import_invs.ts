@@ -69,9 +69,9 @@ async function main() {
 
         })
         .on('end', async function () {
-            // items.forEach(it => em.persist(it));
-            // await em.flush();
-            // console.log("Done");
+            items.forEach(it => em.persist(it));
+            await em.flush();
+            console.log("Done");
         });
 }
 

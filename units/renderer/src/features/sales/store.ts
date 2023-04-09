@@ -154,6 +154,9 @@ export class CartStore {
 
     clear() {
         this.items.splice(0, this.items.length);
+        this.amountPaid = 0;
+        this.discount = 0;
+        this.customer = null;
     }
 
     setStage(stage: POSStage) {
@@ -198,7 +201,7 @@ export class CartStore {
             return CartHealth.InvalidDiscount;
 
         if (this.method == SaleMethod.Direct) {
-            if (this.amountPaid < this.billAmount)
+            if (this.amountPaid < this.payable)
                 return CartHealth.InsufficientCash;
         } else {
             if (this.customer == null)
@@ -225,26 +228,42 @@ class InventoryStore {
         });
     }
 
-    fetchAvailableItems() {
+    async fetchAvailableItems() {
         this.loading = true;
         let _this = this;
 
-        return window.SystemBackend.sendMessage(new MSG.Stock.GetStocks()).then(res => {
-            _this.loading = false;
+        const res = await window.SystemBackend.sendMessage(new MSG.Stock.GetStocks());
+        _this.loading = false;
 
-            if (!isResponseSuccessful(res)) {
-                console.error("InventoryStore::fetchAvailableItems(): Failed to complete message:", formatResponseErrorLog(res));
-                simpleErrorAlert("Could not fetch available items");
-                return;
-            }
+        if (!isResponseSuccessful(res)) {
+            console.error("InventoryStore::fetchAvailableItems(): Failed to complete message:", formatResponseErrorLog(res));
+            simpleErrorAlert("Could not fetch available items");
+            return;
+        }
 
-            _this.allItems = res.data!;
-        });
+        _this.allItems = res.data!;
     }
 };
 
-export async function MakeSale(store: CartStore): Promise<void> {
-    console.log("Making sale");
+export async function MakeSale(store: CartStore): Promise<boolean> {
+    let msg = new MSG.Sale.CreateSale({
+        meta: {
+            method: store.method,
+            customer_id: store.customer?.id || null,
+            discount: store.discount,
+            amount_paid: store.amountPaid
+        },
+        cart: store.items.map(it => it.pack())
+    });
+
+    const res = await window.SystemBackend.sendMessage(msg);
+
+    if (!isResponseSuccessful(res)) {
+        console.error("::MakeSale(): Failed to complete message:", formatResponseErrorLog(res));
+        return false;
+    }
+
+    return true;
 }
 
 export const cartStore = new CartStore();

@@ -24,10 +24,14 @@ export class SaleChannel extends IpcChannel {
     }
 
     private newSale = new MsgDispatch(MSG.Sale.CreateSale, async ({ cart, meta }) => {
-        // **TODO**: Check if there are enough units of each item to proceed with the sale
+        // TODO: Check if there are enough units of each item to proceed with the sale
 
         if (cart.length == 0)
             return;
+
+        if (meta.discount < 0)
+            throw new ChannelError("Discount not valid");
+
 
         const em = EFORK();
 
@@ -35,9 +39,9 @@ export class SaleChannel extends IpcChannel {
             method: meta.method,
         });
 
+        let customer: Customer | null = null;
         // Record the customer if the sale is a credit sale
         if (meta.method == SaleMethod.Credit) {
-            let customer: Customer;
             try {
                 customer = await em.findOneOrFail(Customer, { id: meta.customer_id });
             }
@@ -48,7 +52,7 @@ export class SaleChannel extends IpcChannel {
             sale.customer = Reference.create(customer);
         }
         else {
-            sale.customer = null;
+            sale.customer = customer = null;
         }
 
         // Preload the required items
@@ -78,7 +82,25 @@ export class SaleChannel extends IpcChannel {
         }
 
         sale.amount_total = totalAmount;
+        sale.discount = meta.discount;
+        sale.amount_payable = totalAmount - meta.discount;
 
-        await em.persistAndFlush(sale);
+        if (meta.method == SaleMethod.Direct) {
+            if (meta.amount_paid < totalAmount) {
+                throw new ChannelError("Not enough amount paid.");
+            }
+        }
+        else {
+            // TODO: add the pending balance to the customer's payable 
+            let cust = customer!;
+            cust.total_payable += sale.amount_payable;
+            em.persist(cust);
+        }
+
+        // TODO: remove these now sold items from the stock 
+
+        em.persist(sale);
+
+        await em.flush();
     });
 }

@@ -21,8 +21,9 @@ export class Sale extends SimpleEntity {
 
     public cart: Collection<SaleItem>;
 
-    public amount_total: number;
-    public amount_paid: number;
+    public amount_total: number; // without discount
+    public discount: number;
+    public amount_payable: number; // total - discount
 
     public created_at: Date;
 }
@@ -48,7 +49,8 @@ export const SaleSchema = new EntitySchema<Sale, SimpleEntity>({
         customer: CreateEnttRef(() => Customer, { nullable: true }),
         cart: CreateInverseManyEnttRef(() => SaleItem, saleItem => saleItem.sale),
         amount_total: { type: Number, unsigned: false, nullable: false },
-        amount_paid: { type: Number, unsigned: false, nullable: false },
+        discount: { type: Number, unsigned: false, nullable: false },
+        amount_payable: { type: Number, unsigned: false, nullable: false },
         created_at: { type: Date, nullable: false, onCreate: () => new Date() },
     }
 });
