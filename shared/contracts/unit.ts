@@ -50,6 +50,10 @@ export class Quantity {
         return new Quantity(unit, packed.base, packed.fractional);
     }
 
+    clone_unit(): Quantity {
+        return new Quantity(this.unit, 0, 0);
+    }
+
     absoluteValue(): number {
         let value = this.base;
         if (this.unit.isFractional())
@@ -66,6 +70,20 @@ export class Quantity {
         }
 
         return value;
+    }
+
+    setEffectiveVal(v: number): Quantity {
+        v = Math.max(0, v);
+        if (this.unit.isFractional()) {
+            let parts = this.unit.getFractionalParts();
+            this.base = Math.floor(v / parts);
+            this.fractional = Math.floor(v % parts);
+        }
+        else {
+            this.base = v;
+        }
+
+        return this;
     }
 
     applyPrice(price: number): number {

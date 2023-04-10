@@ -62,7 +62,7 @@ const AddByProductCodePanel = () => {
   const [foundState, setFoundState] = React.useState<State>(State.Clean);
 
   const onAdd = React.useCallback((code) => {
-    const itemRes = invStore.allItems.find((it) => it.item.pcode == code);
+    const itemRes = invStore.allItems.find((it) => it.pcode == code);
     setLastPrCode(code);
 
     if (itemRes == undefined) {

@@ -37,7 +37,7 @@ const onDialogClose = action(() => {
 
 function fillRandomCart() {
   const fracItem = invStore.allItems.find((it) =>
-    Units.fromSlug(it.item.unit)?.isFractional()
+    Units.fromSlug(it.unit)?.isFractional()
   );
 
   for (let i = 0; i < 3; ++i) {

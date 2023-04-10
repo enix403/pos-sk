@@ -76,7 +76,27 @@ export namespace MSG {
             };
         };
 
-        export class CreateSale extends SimpleMessage<CreateSaleX.Capture, void>
+        export enum SaleResult {
+            Success,
+            EmptyCart,
+            ItemsOutOfStock
+        }
+
+        export type OutStockItem = {
+            item: Identified<IStoreItem>,
+            available: number,
+            requested: number
+        }
+
+        type SaleCompletion = {
+            result: SaleResult,
+            out_stock_items: OutStockItem[]
+        }
+
+        export const to_sale_completion = (res: SaleResult): SaleCompletion =>
+            ({ result: res, out_stock_items: [] });
+
+        export class CreateSale extends SimpleMessage<CreateSaleX.Capture, SaleCompletion>
         { static ACTION_NAME = "sale:new"; }
 
         /* =========================== */

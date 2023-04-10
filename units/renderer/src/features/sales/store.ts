@@ -3,6 +3,7 @@ import { makeAutoObservable, makeObservable, observable } from 'mobx'
 
 import type { Identified } from '@shared/tsutils'
 import { ISaleCartItem, SaleMethod } from '@shared/contracts/ISale'
+import { IStoreItem } from '@shared/contracts/IStoreItem'
 import { IItemStock } from '@shared/contracts/IItemStock'
 
 import { DUMMY_ITEMS } from './temp_items'
@@ -13,7 +14,8 @@ import { simpleErrorAlert, isResponseSuccessful, formatResponseErrorLog } from '
 import { MSG } from '@shared/communication';
 import { Units, Quantity } from '@shared/contracts/unit'
 
-export type ItemResource = Identified<IItemStock>;
+// export type ItemResource = Identified<IItemStock>;
+export type ItemResource = Identified<IStoreItem>;
 
 export class CartItem {
     store: CartStore
@@ -24,9 +26,9 @@ export class CartItem {
     constructor(store: CartStore, item: ItemResource) {
         this.store = store;
         this.itemResource = item;
-        this.price = item.item.retail_price;
+        this.price = item.retail_price;
 
-        let unit = Units.fromSlug(item.item.unit);
+        let unit = Units.fromSlug(item.unit);
 
         if (unit == null) {
             throw new Error(`Unit "${this.rawItem.unit}" not found`);
@@ -44,7 +46,7 @@ export class CartItem {
     }
 
     get rawItem() {
-        return this.itemResource.item;
+        return this.itemResource;
     }
 
     setQuantity(qty: number) {
@@ -139,7 +141,7 @@ export class CartStore {
     }
 
     addItem(storeItem: ItemResource) {
-        let old = this.items.find(t => t.rawItem.id == storeItem.item.id);
+        let old = this.items.find(t => t.rawItem.id == storeItem.id);
         if (!old)
             this.items.push(new CartItem(this, storeItem));
         else
@@ -232,7 +234,7 @@ class InventoryStore {
         this.loading = true;
         let _this = this;
 
-        const res = await window.SystemBackend.sendMessage(new MSG.Stock.GetStocks());
+        const res = await window.SystemBackend.sendMessage(new MSG.Stock.GetStoreItems());
         _this.loading = false;
 
         if (!isResponseSuccessful(res)) {

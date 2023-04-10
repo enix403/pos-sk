@@ -27,15 +27,24 @@ export const formatResponseErrorUser = (response: ChannelResponse<any>): string 
     else
         return response.error || 'An error occured [ERR_CHANNEL_ERROR]';
 }
-
+/*
 const LOG_ERROR_MESSAGES = {
     [CommResultType.CommunicationError]: "CommunicationError: A communication error has occured",
     [CommResultType.SystemError]: "SystemError: A system error has occured",
     [CommResultType.ChannelError]: "ChannelError: A channel error occured",
 };
+ */
+const LOG_ERROR_MESSAGES = {
+    [CommResultType.CommunicationError]: "CommunicationError",
+    [CommResultType.SystemError]: "SystemError",
+    [CommResultType.ChannelError]: "ChannelError",
+};
 
-export const formatResponseErrorLog = (response: ChannelResponse<any>): string =>
-    LOG_ERROR_MESSAGES[response.type]
+
+export const formatResponseErrorLog = (response: ChannelResponse<any>): string => {
+    return (LOG_ERROR_MESSAGES[response.type] || "formatResponseErrorLog()") + ": " + response.error;
+}
+// LOG_ERROR_MESSAGES[response.type]
 
 export const simpleErrorAlert = (message: string) => {
     AppToaster.show({
