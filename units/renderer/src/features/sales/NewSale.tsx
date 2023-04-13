@@ -1,6 +1,8 @@
 import React from "react";
 import "./NewSale.scss";
 
+import { Overlay, Spinner } from "@blueprintjs/core";
+
 import { action } from "mobx";
 import { Observer } from "mobx-react";
 
@@ -9,10 +11,11 @@ import { POSStage, CartStoreContext, rootStore, MakeSale } from "./store";
 import { CartListPanel } from "./CartListPanel";
 import { AddItemPanel } from "./AddItemPanel";
 import { FinancialsPanel } from "./FinancialsPanel";
-
 import { CheckoutConfirmDialog } from "./CheckoutConfirmDialog";
-import { Units } from "@shared/contracts/unit";
+import { OutOfStockDialog } from "./OutOfStockDialog";
+
 import { simpleSuccessAlert, simpleErrorAlert } from "@/utils";
+import { Units } from "@shared/contracts/unit";
 
 const { cartStore, invStore } = rootStore;
 
@@ -52,6 +55,7 @@ function fillRandomCart() {
 export const NewSaleView = () => {
   React.useEffect(() => {
     invStore.fetchAvailableItems().then(() => {
+      cartStore.clear();
       fillRandomCart();
     });
   }, []);
@@ -62,6 +66,23 @@ export const NewSaleView = () => {
         <AddItemPanel />
         <FinancialsPanel />
       </div>
+
+      <Observer>
+        {() => (
+          <Overlay
+            canEscapeKeyClose={false}
+            canOutsideClickClose={false}
+            usePortal={true}
+            isOpen={cartStore.stage == POSStage.PostCheckout}
+          >
+            <div className="ui-spinner">
+              <Spinner intent="danger" size={190} />
+            </div>
+          </Overlay>
+        )}
+      </Observer>
+
+      <OutOfStockDialog isOpen={false} onClose={() => {}} />
 
       <Observer>
         {() => (

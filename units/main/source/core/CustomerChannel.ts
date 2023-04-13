@@ -6,6 +6,7 @@ import { EFORK } from "@/database";
 import {
     Customer,
 } from '@/entities';
+import { ChannelError } from "@/channel/exceptions";
 
 export class CustomerChannel extends IpcChannel {
     constructor() {
@@ -16,6 +17,10 @@ export class CustomerChannel extends IpcChannel {
 
     private addCustomer = new MsgDispatch(MSG.Customer.AddCustomer, async ({ name }) => {
         const em = EFORK();
+
+        if (!name)
+            throw new ChannelError("Name must not be empty");
+
         const cust = em.create(Customer, {
             name,
             total_payable: 0

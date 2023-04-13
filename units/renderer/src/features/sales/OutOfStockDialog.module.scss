@@ -1,0 +1,35 @@
+$table-header-background: #FF9980;
+
+div.ots-table {
+    table {
+        table-layout: fixed;
+    }
+
+    table th {
+        background-color: $table-header-background;
+        color: #fff;
+        font-size: 17px;
+        text-transform: uppercase;
+        font-weight: 800;
+
+        &:hover {
+            background-color: $table-header-background;
+        }
+    }
+
+    td {
+        font-size: 1.02rem;
+    }
+
+    .item {
+        text-overflow: ellipsis;
+        word-wrap: break-word;
+        word-break: break-all;
+        white-space: normal;
+        overflow-x: hidden;
+    }
+
+    .qty {
+        font-family: "Fira Code";
+    }
+}

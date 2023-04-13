@@ -6,7 +6,7 @@ import cn from "classnames";
 import { Classes, Dialog, Button } from "@blueprintjs/core";
 
 import { numberWithCommas, useStores } from "./common";
-import { SaleMethod } from "@/../../../shared/contracts/ISale";
+import { SaleMethod } from "@shared/contracts/ISale";
 
 const ItemsTable = () => {
   const { cartStore } = useStores();

@@ -62,7 +62,7 @@ async function main() {
 
             const stockObject = em.create(ItemStock, {
                 item: item,
-                unit_count: 300
+                unit_count: 0
             });
 
             items.push(stockObject);

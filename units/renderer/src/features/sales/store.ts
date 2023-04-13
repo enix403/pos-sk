@@ -4,12 +4,9 @@ import { makeAutoObservable, makeObservable, observable } from 'mobx'
 import type { Identified } from '@shared/tsutils'
 import { ISaleCartItem, SaleMethod } from '@shared/contracts/ISale'
 import { IStoreItem } from '@shared/contracts/IStoreItem'
-import { IItemStock } from '@shared/contracts/IItemStock'
 
-import { DUMMY_ITEMS } from './temp_items'
 import type { CustomerResource } from './CreditCustomerSelect';
 
-import { MessageTracker } from '@/features/MessageTracker';
 import { simpleErrorAlert, isResponseSuccessful, formatResponseErrorLog } from '@/utils';
 import { MSG } from '@shared/communication';
 import { Units, Quantity } from '@shared/contracts/unit'
@@ -94,7 +91,9 @@ export enum POSStage {
     // is shown and is awaiting user confirmation
     Checkout,
     // System is busy performing the sale (storing/writing it in system's database)
-    PostCheckout
+    PostCheckout,
+    // Some items from this order happen to be out or stock
+    ItemsOutOfStock
 }
 
 // Todo: Make it a bitmask or array to handle more than one errors at a time
@@ -280,7 +279,5 @@ export const rootStore = {
 window.cartStore = cartStore;
 // @ts-ignore
 window.invStore = invStore;
-// @ts-ignore
-window.di = DUMMY_ITEMS;
 
 export const CartStoreContext = createContext<typeof rootStore | undefined>(undefined);

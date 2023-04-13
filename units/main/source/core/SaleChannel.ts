@@ -87,7 +87,7 @@ export class SaleChannel extends IpcChannel {
             let efv = qty.effectiveValue();
 
             // unit_count is already "effective"
-            if (false && efv > dbStock.unit_count) {
+            if (efv > dbStock.unit_count) {
                 out_of_stock = true;
                 out_items.push({
                     item: storeItem,
@@ -103,7 +103,7 @@ export class SaleChannel extends IpcChannel {
             if (out_of_stock)
                 continue;
 
-            // dbStock.unit_count -= efv;
+            dbStock.unit_count -= efv;
 
             const saleItemObject = em.create(SaleItem, {
                 item: Reference.create(storeItem),
@@ -140,11 +140,9 @@ export class SaleChannel extends IpcChannel {
             em.persist(cust);
         }
 
-        // TODO: remove these now sold items from the stock
-
         em.persist(sale);
 
-        await em.flush();
+        // await em.flush();
 
         return to_sale_completion(SaleResult.Success);
     });

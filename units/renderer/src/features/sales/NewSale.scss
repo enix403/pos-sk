@@ -1,6 +1,28 @@
 @import '@fontsource/fira-code/latin-500.css';
 @import '@fontsource/fira-code/latin-700.css';
 
+
+.ui-spinner {
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    align-items: center;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    justify-content: center;
+    min-height: 100%;
+    pointer-events: none;
+    -webkit-transform: scale(1);
+    transform: scale(1);
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    width: 100%;
+}
+
 .number-bold-input .bp3-input-group {
     font-weight: 500;
     font-family: 'Fira Code';
@@ -12,7 +34,8 @@
     margin-bottom: 16px;
 }
 
-.fin-row, .discount-row {
+.fin-row,
+.discount-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -21,12 +44,14 @@
 .fin-row {
     padding-bottom: 8px;
     border-bottom: 1px solid #8a8a8a;
+
     .t {
         text-transform: uppercase;
         color: #C5CBD3;
         font-weight: 400;
         font-size: 17px;
     }
+
     .v {
         font-weight: 700;
         font-size: 18px;
@@ -36,15 +61,28 @@
 
 @mixin money-highlight($hColor) {
     border-color: $hColor !important;
-    .t, .v {
+
+    .t,
+    .v {
         color: $hColor !important;
     }
 }
 
-.fin-row.money-highlight { @include money-highlight(#96ffd2); }
-.fin-row.money-highlight-light { @include money-highlight(#404854); }
-.fin-row.money-highlight-alt { @include money-highlight(#FFD97D); }
-.fin-row.money-highlight-err { @include money-highlight(#FF9B85); }
+.fin-row.money-highlight {
+    @include money-highlight(#96ffd2);
+}
+
+.fin-row.money-highlight-light {
+    @include money-highlight(#404854);
+}
+
+.fin-row.money-highlight-alt {
+    @include money-highlight(#FFD97D);
+}
+
+.fin-row.money-highlight-err {
+    @include money-highlight(#FF9B85);
+}
 
 /* /--- */
 
@@ -117,11 +155,13 @@ table.cart-item-list {
         text-transform: uppercase;
     }
 
-    td, th {
+    td,
+    th {
         &.fitwidth {
             width: 1px;
             white-space: nowrap;
         }
+
         &.alcenter {
             text-align: center;
         }
@@ -146,12 +186,15 @@ table.cart-item-list {
 table.cart-item-list {
     border-collapse: collapse;
 
-    td, th {
+    td,
+    th {
         padding-left: 8px;
         padding-right: 8px;
     }
 
-    td, th, tr {
+    td,
+    th,
+    tr {
         border-width: 1px;
         border-color: #404854;
         border-style: solid;
@@ -177,7 +220,8 @@ table.cart-item-list {
 
 /* ------------------------------ */
 .bar-panel .scan-status {
-    margin-top: auto; /* Push it to the end of flex container  */
+    margin-top: auto;
+    /* Push it to the end of flex container  */
     margin-bottom: 16px;
 
     .scan-tag {
