@@ -7,9 +7,6 @@ import { ISaleCartItem, SaleMethod } from "@shared/contracts/ISale";
 
 import { EFORK } from "@/database";
 
-import { sleep } from '@shared/commonutils'
-import { logger } from '@/logging'
-
 import { Sale, SaleItem, Customer, ItemStock } from '@/entities'
 import { Quantity } from '@shared/contracts/unit';
 
@@ -100,10 +97,10 @@ export class SaleChannel extends IpcChannel {
 
             totalAmount += subtotal;
 
+            dbStock.unit_count -= efv;
+
             if (out_of_stock)
                 continue;
-
-            dbStock.unit_count -= efv;
 
             const saleItemObject = em.create(SaleItem, {
                 item: Reference.create(storeItem),

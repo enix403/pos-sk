@@ -2,6 +2,7 @@ import React from "react";
 import cn from "classnames";
 
 import { CartStoreContext } from "./store";
+import { Quantity } from "@shared/contracts/unit";
 
 export const financialInputProps = {
   allowNumericCharactersOnly: true,
@@ -32,4 +33,8 @@ export const StatRow = ({ title, value, ...rest }) => (
 
 export function useStores() {
   return React.useContext(CartStoreContext)!;
+}
+
+export function renderQuantity(qty: Quantity) {
+  return numberWithCommas(qty.absoluteValue()) + " " + qty.unit.shortName;
 }

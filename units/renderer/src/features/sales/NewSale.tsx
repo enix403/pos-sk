@@ -3,7 +3,7 @@ import "./NewSale.scss";
 
 import { Overlay, Spinner } from "@blueprintjs/core";
 
-import { action } from "mobx";
+import { action, makeAutoObservable, runInAction } from "mobx";
 import { Observer } from "mobx-react";
 
 import { POSStage, CartStoreContext, rootStore, MakeSale } from "./store";
@@ -16,22 +16,54 @@ import { OutOfStockDialog } from "./OutOfStockDialog";
 
 import { simpleSuccessAlert, simpleErrorAlert } from "@/utils";
 import { Units } from "@shared/contracts/unit";
+import { MSG } from "@shared/communication";
 
 const { cartStore, invStore } = rootStore;
 
-const onDialogCofirm = action(() => {
+class OTSStore {
+  dialogShown = false;
+  items: MSG.Sale.OutStockItem[] = [];
+
+  constructor() {
+    makeAutoObservable(this);
+  }
+
+  showDialog() {
+    this.dialogShown = true;
+    cartStore.stage = POSStage.ItemsOutOfStock;
+  }
+
+  closeDialog() {
+    this.dialogShown = false;
+    cartStore.stage = POSStage.Idle;
+  }
+}
+const otsStore = (window["otsStore"] = new OTSStore());
+
+const onDialogCofirm = action(async () => {
   cartStore.stage = POSStage.PostCheckout;
-  MakeSale(cartStore).then(
-    action((success) => {
-      cartStore.stage = POSStage.Idle;
-      if (success) {
-        cartStore.clear();
-        simpleSuccessAlert("Sale done");
-      } else {
-        simpleErrorAlert("Could not perform sale");
-      }
-    })
-  );
+
+  const saleRes = await MakeSale(cartStore);
+
+  cartStore.stage = POSStage.Idle;
+
+  if (saleRes === null) {
+    simpleErrorAlert("Could not perform sale");
+    return;
+  }
+
+  const saleData = saleRes.data!;
+
+  if (saleData.result == MSG.Sale.SaleResult.ItemsOutOfStock) {
+    runInAction(() => {
+      otsStore.items = saleData.out_stock_items;
+      otsStore.showDialog();
+    });
+  } else {
+    otsStore.dialogShown = false;
+    cartStore.clear();
+    simpleSuccessAlert("Sale done");
+  }
 });
 
 const onDialogClose = action(() => {
@@ -82,7 +114,15 @@ export const NewSaleView = () => {
         )}
       </Observer>
 
-      <OutOfStockDialog isOpen={false} onClose={() => {}} />
+      <Observer>
+        {() => (
+          <OutOfStockDialog
+            isOpen={otsStore.dialogShown}
+            items={otsStore.items}
+            onClose={() => otsStore.closeDialog()}
+          />
+        )}
+      </Observer>
 
       <Observer>
         {() => (

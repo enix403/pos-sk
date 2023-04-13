@@ -5,7 +5,7 @@ import cn from "classnames";
 
 import { Classes, Dialog, Button } from "@blueprintjs/core";
 
-import { numberWithCommas, useStores } from "./common";
+import { numberWithCommas, useStores, renderQuantity } from "./common";
 import { SaleMethod } from "@shared/contracts/ISale";
 
 const ItemsTable = () => {
@@ -36,8 +36,7 @@ const ItemsTable = () => {
             <td className="cell-item">{itCart.rawItem.name}</td>
             <td className="cell-price">{itCart.price}</td>
             <td className="cell-qty">
-              {numberWithCommas(itCart.quantity.absoluteValue())}{" "}
-              {itCart.quantity.unit.shortName}
+              {renderQuantity(itCart.quantity)}
             </td>
             <td className="cell-subtotal">{itCart.subtotal}</td>
           </tr>

@@ -246,7 +246,7 @@ class InventoryStore {
     }
 };
 
-export async function MakeSale(store: CartStore): Promise<boolean> {
+export async function MakeSale(store: CartStore) {
     let msg = new MSG.Sale.CreateSale({
         meta: {
             method: store.method,
@@ -261,10 +261,10 @@ export async function MakeSale(store: CartStore): Promise<boolean> {
 
     if (!isResponseSuccessful(res)) {
         console.error("::MakeSale(): Failed to complete message:", formatResponseErrorLog(res));
-        return false;
+        return null;
     }
 
-    return true;
+    return res;
 }
 
 export const cartStore = new CartStore();
